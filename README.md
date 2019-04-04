@@ -1,18 +1,10 @@
+# Ark Desktop Wallet
 
-[![Build Status](https://travis-ci.org/ArkEcosystem/desktop-wallet.svg?branch=master)](https://travis-ci.org/ArkEcosystem/desktop-wallet)
-[![Github Latest Release](https://img.shields.io/github/release/ArkEcosystem/desktop-wallet.svg)](https://github.com/ArkEcosystem/desktop-wallet/releases/latest)
-[![Github Downloads](https://img.shields.io/github/downloads/ArkEcosystem/desktop-wallet/latest/total.svg?logo=github)](https://github.com/ArkEcosystem/desktop-wallet/releases/latest)
-[![Gitter Room](https://img.shields.io/gitter/room/ark-developers/Lobby.svg?logo=gitter-white&colorB=e53467)](https://gitter.im/ark-developers/Lobby)
+![Ark Desktop Wallet](./banner.png)
 
-# Pinned: Critical bugs only!
-Since we are working on the next-gen version of the wallet, we won't be reviewing pull requests with new features and bugs (only critical bugs will be reviewed and merged). Our intention is deploying the first beta of the v2 desktop wallet in a few weeks time so we need to be focused on it exclusively.
-
-Please do not submit Pull-Requests (PRs) unless they solve an urgent problem.
-
-## Pinned: Help us with translations
-Collaborate with other translators on our OneSky project and help us get wallet translated in other languages  http://osjc1wl.oneskyapp.com/collaboration/project?id=95031
-
-Please do not submit Pull-Requests (PRs) for translations, but use the link above!
+[![Build Status](https://badgen.now.sh/circleci/github/ArkEcosystem/desktop-wallet)](https://circleci.com/gh/ArkEcosystem/desktop-wallet)
+[![Latest Version](https://badgen.now.sh/github/release/ArkEcosystem/desktop-wallet)](https://github.com/ArkEcosystem/desktop-wallet/releases)
+[![License: MIT](https://badgen.now.sh/badge/license/MIT/green)](https://opensource.org/licenses/MIT)
 
 ## Download
 [Latest Release](https://github.com/ArkEcosystem/ark-desktop/releases)

@@ -7,7 +7,7 @@
       'pt-2': !isFirstItem,
       'pb-2 border-b': !isLastItem
     }"
-    class="MenuStepItem"
+    class="MenuStepItem border-theme-line-separator"
     @open="emitOpen"
     @close="emitClose"
   >
@@ -107,7 +107,7 @@ export default {
     },
 
     emitNext (isLastItem) {
-      if (!this.lastItemClicked) {
+      if (!this.isLastItemClicked) {
         this.$emit('next')
       }
       if (isLastItem) {

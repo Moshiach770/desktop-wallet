@@ -1,22 +1,26 @@
 <template>
-  <div class="WalletImport relative bg-theme-feature rounded-lg m-r-4">
-    <main class="flex flex-row h-full">
+  <div class="WalletImport relative">
+    <main class="flex h-full">
       <div
-        :style="`background-image: url('${assets_loadImage(backgroundImages[session_hasDarkTheme][step])}')`"
-        class="WalletImport__instructions flex-grow background-image w-3/5"
+        class="ProfileNew__instructions theme-dark bg-theme-feature text-theme-page-instructions-text hidden lg:flex flex-1 mr-4 rounded-lg overflow-y-auto"
       >
-        <div class="instructions-text">
-          <h3 class="mb-2 text-theme-page-instructions-text">
+        <div class="m-auto w-3/5 text-center flex flex-col items-center justify-center">
+          <h1 class="text-inherit">
             {{ $t(`PAGES.WALLET_IMPORT.STEP${step}.INSTRUCTIONS.HEADER`) }}
-          </h3>
-
-          <p>
+          </h1>
+          <p class="text-center py-2 leading-normal">
             {{ $t(`PAGES.WALLET_IMPORT.STEP${step}.INSTRUCTIONS.TEXT`) }}
           </p>
+
+          <img
+            :src="assets_loadImage(backgroundImages[step])"
+            :title="$t(`PAGES.WALLET_IMPORT.STEP${step}.INSTRUCTIONS.HEADER`)"
+            class="w-full xl:w-4/5 mt-10"
+          >
         </div>
       </div>
 
-      <div class="flex-no-grow p-10 w-2/5">
+      <div class="flex-none w-full lg:max-w-sm bg-theme-feature rounded-lg overflow-y-auto p-10">
         <MenuStep
           :step="step"
         >
@@ -48,6 +52,8 @@
                 v-show="!useOnlyPassphrase"
                 ref="addressInput"
                 v-model="schema.address"
+                :is-invalid="$v.schema.address.$invalid"
+                :helper-text="addressError"
                 :pub-key-hash="session_network.version"
                 class="my-3"
               />
@@ -112,7 +118,7 @@
             :is-next-enabled="!$v.step3.$invalid"
             :title="$t('PAGES.WALLET_IMPORT.STEP3.TITLE')"
             @back="!useOnlyAddress ? moveTo(2) : moveTo(1)"
-            @next="importWallet"
+            @next="onCreate"
           >
             <div class="flex flex-col h-full w-full justify-around">
               <InputText
@@ -154,6 +160,7 @@ import { ModalLoader } from '@/components/Modal'
 import { PassphraseInput } from '@/components/Passphrase'
 import WalletService from '@/services/wallet'
 import Wallet from '@/models/wallet'
+import onCreate from './mixin-on-create'
 
 export default {
   name: 'WalletImport',
@@ -169,6 +176,8 @@ export default {
     PassphraseInput
   },
 
+  mixins: [onCreate],
+
   schema: Wallet.schema,
 
   data: () => ({
@@ -180,31 +189,35 @@ export default {
     walletPassword: null,
     walletConfirmPassword: null,
     showEncryptLoader: false,
-    bip38Worker: null,
     backgroundImages: {
-      true: {
-        1: 'pages/wallet-new/background-step-1-dark.png',
-        2: 'pages/wallet-new/background-step-2-dark.png',
-        3: 'pages/wallet-new/background-step-5-dark.png'
-      },
-      false: {
-        1: 'pages/wallet-new/background-step-1.png',
-        2: 'pages/wallet-new/background-step-2.png',
-        3: 'pages/wallet-new/background-step-5.png'
-      }
+      1: 'pages/wallet-new/import-wallet.svg',
+      2: 'pages/wallet-new/encrypt-wallet.svg',
+      3: 'pages/wallet-new/protect-wallet.svg'
     }
   }),
 
   computed: {
     nameError () {
       if (this.$v.schema.name.$invalid) {
-        if (!this.$v.schema.name.doesNotExists) {
-          return this.$t('VALIDATION.NAME.DUPLICATED', [this.schema.name])
+        if (!this.$v.schema.name.contactDoesNotExist) {
+          return this.$t('VALIDATION.NAME.EXISTS_AS_CONTACT', [this.schema.name])
+        } else if (!this.$v.schema.name.walletDoesNotExist) {
+          return this.$t('VALIDATION.NAME.EXISTS_AS_WALLET', [this.schema.name])
         } else if (!this.$v.schema.name.schemaMaxLength) {
           return this.$t('VALIDATION.NAME.MAX_LENGTH', [Wallet.schema.properties.name.maxLength])
         // NOTE: not used, unless the minimum length is changed
         } else if (!this.$v.schema.name.schemaMinLength) {
           return this.$tc('VALIDATION.NAME.MIN_LENGTH', Wallet.schema.properties.name.minLength)
+        }
+      }
+      return null
+    },
+    addressError () {
+      if (this.$v.schema.address.$invalid) {
+        if (!this.$v.schema.address.contactDoesNotExist) {
+          return this.$t('VALIDATION.ADDRESS.EXISTS_AS_CONTACT', [this.schema.address])
+        } else if (!this.$v.schema.address.walletDoesNotExist) {
+          return this.$t('VALIDATION.ADDRESS.EXISTS_AS_WALLET', [this.schema.address])
         }
       }
       return null
@@ -217,27 +230,11 @@ export default {
      */
     step () {
       if (this.step === 2 && !this.useOnlyAddress) {
+        // Important: .normalize('NFD') is needed to properly work with Korean bip39 words
+        // It alters the passphrase string, so no need to normalize again in the onCreate function
         this.schema.address = WalletService.getAddress(this.schema.passphrase, this.session_network.version)
       }
     }
-  },
-
-  beforeDestroy () {
-    this.bip38Worker.send('quit')
-  },
-
-  mounted () {
-    if (this.bip38Worker) {
-      this.bip38Worker.send('quit')
-    }
-    this.bip38Worker = this.$bgWorker.bip38()
-    this.bip38Worker.on('message', message => {
-      if (message.bip38key) {
-        this.showEncryptLoader = false
-        this.wallet.passphrase = message.bip38key
-        this.finishCreate()
-      }
-    })
   },
 
   beforeRouteEnter (to, from, next) {
@@ -248,30 +245,7 @@ export default {
   },
 
   methods: {
-    async importWallet () {
-      this.wallet = {
-        ...this.schema,
-        profileId: this.session_profile.id
-      }
-      if (!this.useOnlyAddress) {
-        this.wallet.publicKey = WalletService.getPublicKeyFromPassphrase(this.wallet.passphrase)
-      }
-
-      if (!this.useOnlyAddress && this.walletPassword && this.walletPassword.length) {
-        this.showEncryptLoader = true
-        this.bip38Worker.send({
-          passphrase: this.wallet.passphrase,
-          password: this.walletPassword,
-          wif: this.session_network.wif
-        })
-      } else {
-        this.wallet.passphrase = null
-
-        this.finishCreate()
-      }
-    },
-
-    async finishCreate () {
+    async createWallet () {
       try {
         const { address } = await this.$store.dispatch('wallet/create', this.wallet)
         this.$router.push({ name: 'wallet-show', params: { address } })
@@ -340,11 +314,24 @@ export default {
           }
 
           return false
+        },
+        contactDoesNotExist (value) {
+          const contact = this.$store.getters['wallet/byAddress'](value)
+          return value === '' || !(contact && contact.isContact)
+        },
+        walletDoesNotExist (value) {
+          const wallet = this.$store.getters['wallet/byAddress'](value)
+          return value === '' || !(wallet && !wallet.isContact)
         }
       },
       name: {
-        doesNotExists (value) {
-          return value === '' || !this.$store.getters['wallet/byName'](value)
+        contactDoesNotExist (value) {
+          const contact = this.$store.getters['wallet/byName'](value)
+          return value === '' || !(contact && contact.isContact)
+        },
+        walletDoesNotExist (value) {
+          const wallet = this.$store.getters['wallet/byName'](value)
+          return value === '' || !(wallet && !wallet.isContact)
         }
       },
       passphrase: {

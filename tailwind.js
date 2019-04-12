@@ -89,6 +89,7 @@ let colors = {
 
   'theme-caption-text': 'var(--theme-caption-text)',
   'theme-heading-background': 'var(--theme-heading-background)',
+  'theme-heading-text': 'var(--theme-heading-text)',
 
   'theme-button-special-choice': 'var(--theme-button-special-choice)',
 
@@ -106,6 +107,11 @@ let colors = {
   'theme-option-button': 'var(--theme-option-button)',
   'theme-option-button-hover': 'var(--theme-option-button-hover)',
   'theme-option-button-text': 'var(--theme-option-button-text)',
+  'theme-switch-button': 'var(--theme-switch-button)',
+  'theme-option-heading-button': 'var(--theme-option-heading-button)',
+  'theme-option-heading-button-hover': 'var(--theme-option-heading-button-hover)',
+  'theme-option-heading-button-text': 'var(--theme-option-heading-button-text)',
+  'theme-input-field-border': 'var(--theme-input-field-border)',
   'theme-input-toggle-choice': 'var(--theme-input-toggle-choice)',
   'theme-input-toggle-choice-text': 'var(--theme-input-toggle-choice-text)',
   'theme-modal-footer-button': 'var(--theme-modal-footer-button)',
@@ -121,12 +127,13 @@ let colors = {
   'theme-voting-banner-button-text': 'var(--theme-voting-banner-text)',
   'theme-voting-banner-button-text-hover': 'var(--theme-voting-banner-text-hover)',
 
-  'theme-settings': '#343956',
-  'theme-settings-sub': '#3f4565',
-  'theme-settings-button': '#4e5477',
-  'theme-settings-heading': '#a8acbe',
-  'theme-settings-border': '#444a6d',
-  'theme-settings-text': '#a6add5',
+  'theme-settings': 'var(--theme-settings)',
+  'theme-settings-sub': 'var(--theme-settings-sub)',
+  'theme-settings-button': 'var(--theme-settings-button)',
+  'theme-settings-heading': 'var(--theme-settings-heading)',
+  'theme-settings-border': 'var(--theme-settings-border)',
+  'theme-settings-text': 'var(--theme-settings-text)',
+  'theme-settings-control-title': 'var(--theme-settings-control-title)',
 
   'theme-error': 'var(--theme-error)',
   'theme-error-shadow': 'var(--theme-error-shadow)',
@@ -156,7 +163,7 @@ let colors = {
   'red-darkest': '#3b0d0c',
   'red-darker': '#621b18',
   'red-dark': '#cc1f1a',
-  'red': '#e51317', // ARK logo
+  'red': '#e51317', // PHANTOM logo
   'red-light': '#F03643', // Sidemenu hover and selected border
   'red-lighter': '#f9acaa',
   'red-lightest': '#fef4f5', // Sidemenu hover background
@@ -265,7 +272,9 @@ module.exports = {
   screens: {
     'sm': '576px',
     'md': '768px',
+    'max-md': { max: '991px' },
     'lg': '992px',
+    'minmax-lg': { min: '992px', max: '1199px' },
     'xl': '1200px',
     'xxl': '1375px'
   },
@@ -532,6 +541,7 @@ module.exports = {
     'sm': '.125rem',
     default: '.25rem',
     'lg': '.5rem',
+    'xl': '1rem',
     'full': '9999px',
     '1/2': '100%' // Added
   },
@@ -570,6 +580,7 @@ module.exports = {
     '12': '3rem',
     '16': '4rem',
     '18': '4.5rem', // Added
+    '20': '5.0rem', // Added
     '22': '5.5rem', // Added
     '24': '6rem',
     '30': '7rem', // Added
@@ -624,12 +635,14 @@ module.exports = {
     '12': '3rem',
     '16': '4rem',
     '18': '4.5rem', // Added
+    '20': '5.0rem', // Added
     '24': '6rem',
     '30': '7rem', // Added
     '32': '8rem',
     '40': '10rem', // Added
     '48': '12rem',
     '64': '16rem',
+    '100': '25rem', // Added
     '120': '30rem', // Added
     'full': '100%',
     'screen': '100vh'
@@ -965,7 +978,7 @@ module.exports = {
     borderStyle: ['responsive'],
     borderWidths: ['responsive'],
     cursor: ['responsive'],
-    display: ['responsive'],
+    display: ['responsive', 'group-hover'],
     flexbox: ['responsive'],
     float: ['responsive'],
     fonts: ['responsive'],

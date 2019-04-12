@@ -1,5 +1,5 @@
 exports.APP = {
-  website: 'https://ark.io',
+  website: 'https://phantom.io',
   transactionExpiryMinutes: 45
 }
 
@@ -8,18 +8,29 @@ exports.NETWORKS = [
   require('./networks/devnet.json')
 ]
 
+exports.PEERS = {
+  'phantom.mainnet': require('./peers/mainnet.json'),
+  'phantom.devnet': require('./peers/devnet.json')
+}
+
 exports.ANNOUNCEMENTS = {
-  rssUrl: 'https://blog.ark.io/feed'
+  rssUrl: 'https://blog.phantom.io/feed'
+}
+
+exports.VENDOR_FIELD = {
+  defaultMaxLength: 64
 }
 
 exports.I18N = {
   defaultLocale: 'en-US',
   enabledLocales: [
-    'en-US'
+    'en-US',
+    'it-IT'
   ]
 }
 
 exports.BIP39 = {
+  defaultLanguage: 'english',
   languages: [
     'chinese_simplified',
     'chinese_traditional',
@@ -54,7 +65,7 @@ exports.MARKET = {
   source: {
     baseUrl: 'https://min-api.cryptocompare.com'
   },
-  defaultCurrency: 'USD',
+  defaultCurrency: 'BTC',
   crypto: [
     'BTC',
     'ETH',
@@ -71,7 +82,7 @@ exports.MARKET = {
     CNY: { symbol: '¥', fractionDigits: 2 },
     EUR: { symbol: '€', fractionDigits: 2 },
     GBP: { symbol: '£', fractionDigits: 2 },
-    HKD: { symbol: '£', fractionDigits: 2 },
+    HKD: { symbol: 'HK$', fractionDigits: 2 },
     IDR: { symbol: 'IDR', fractionDigits: 2 },
     INR: { symbol: '₹', fractionDigits: 2 },
     JPY: { symbol: '¥', fractionDigits: 0 },
@@ -95,14 +106,14 @@ exports.THEMES = [
 
 exports.V1 = {
   fees: [
-    0.1 * Math.pow(10, 8), // Transfer
-    5 * Math.pow(10, 8), // Second signautre
-    25 * Math.pow(10, 8), // Delegate registration
-    1 * Math.pow(10, 8), // Vote
-    5 * Math.pow(10, 8), // Multisignature
-    0 * Math.pow(10, 8), // IPFS (not supported yet)
-    0 * Math.pow(10, 8), // Timelock transfer (not supported yet)
-    0 * Math.pow(10, 8), // Multu-payment (not supported yet)
-    0 * Math.pow(10, 8) // Delegate resignation (not supported yet)
+    0.1 * 1e8, // Transfer
+    5 * 1e8, // Second signautre
+    25 * 1e8, // Delegate registration
+    1 * 1e8, // Vote
+    5 * 1e8, // Multisignature
+    0 * 1e8, // IPFS (not supported yet)
+    0 * 1e8, // Timelock transfer (not supported yet)
+    0 * 1e8, // Multu-payment (not supported yet)
+    0 * 1e8 // Delegate resignation (not supported yet)
   ]
 }

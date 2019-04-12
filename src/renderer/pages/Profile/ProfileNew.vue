@@ -1,48 +1,45 @@
 <template>
-  <div class="ProfileNew relative bg-theme-feature rounded-lg">
-    <main class="flex flex-row h-full">
+  <div class="ProfileNew relative">
+    <main class="flex h-full">
       <div
-        :style="`background-image: url('${assets_loadImage(backgroundImages[session_hasDarkTheme][step])}')`"
-        class="ProfileNew__instructions w-2/3 background-image"
+        class="ProfileNew__instructions theme-dark bg-theme-feature text-theme-page-instructions-text hidden lg:flex flex-1 mr-4 rounded-lg overflow-y-auto"
       >
-        <div class="instructions-text">
-          <h3 class="mb-2 text-theme-page-instructions-text">
+        <div class="m-auto w-3/5 text-center flex flex-col items-center justify-center">
+          <h1 class="text-inherit">
             {{ $t(`PAGES.PROFILE_NEW.STEP${step}.INSTRUCTIONS.HEADER`) }}
-          </h3>
-          <p>
+          </h1>
+          <p class="text-center py-2 leading-normal">
             {{ $t(`PAGES.PROFILE_NEW.STEP${step}.INSTRUCTIONS.TEXT`) }}
           </p>
+
+          <img
+            :src="assets_loadImage(`pages/profile-new/step-${step}.svg`)"
+            :title="$t(`PAGES.PROFILE_NEW.STEP${step}.INSTRUCTIONS.HEADER`)"
+            class="w-full xl:w-4/5 mt-10"
+          >
         </div>
       </div>
 
-      <div class="w-1/3 p-10">
+      <div class="flex-none w-full lg:max-w-sm p-10 bg-theme-feature rounded-lg overflow-y-auto">
         <MenuStep
           v-model="step"
         >
           <MenuStepItem
             :step="1"
             :is-next-enabled="!$v.step1.$invalid"
-            title="Profile"
+            :title="$t('PAGES.PROFILE_NEW.STEP1.TITLE')"
             @next="moveTo(2)"
           >
             <!-- NOTE wraps the content, but doesn't modify the stepper -->
             <div class="flex flex-col">
-              <InputText
-                v-model="$v.schema.name.$model"
-                :label="$t('PAGES.PROFILE_NEW.STEP1.NAME')"
-                :is-invalid="$v.schema.name.$dirty && $v.schema.name.$invalid"
-                :helper-text="nameError"
-                class="mb-5"
-                name="name"
-              />
-
               <div class="flex mb-5">
-                <InputSelect
-                  v-model="language"
-                  :items="languages"
-                  :label="$t('COMMON.LANGUAGE')"
-                  name="language"
-                  class="flex-1 mr-2"
+                <InputText
+                  v-model="$v.schema.name.$model"
+                  :label="$t('PAGES.PROFILE_NEW.STEP1.NAME')"
+                  :is-invalid="$v.schema.name.$dirty && $v.schema.name.$invalid"
+                  :helper-text="nameError"
+                  class="flex-1 mr-5"
+                  name="name"
                 />
 
                 <InputSelect
@@ -55,23 +52,47 @@
               </div>
 
               <div class="flex mb-5">
+                <InputLanguage
+                  v-model="language"
+                  name="language"
+                  class="flex-1 mr-5"
+                />
+
                 <InputSelect
                   v-model="bip39Language"
                   :items="bip39Languages"
                   :label="$t('COMMON.BIP39_LANGUAGE')"
                   name="bip39-language"
-                  class="flex-1 mr-2"
+                  class="flex-1"
                 />
               </div>
 
-              <div>
-                <h5 class="mb-2">
-                  {{ $t('COMMON.AVATAR') }}
-                </h5>
+              <div class="flex mb-5 w-1/2 ProfileNew__time-format-container">
+                <InputSelect
+                  v-model="timeFormat"
+                  :items="timeFormats"
+                  :label="$t('COMMON.TIME_FORMAT')"
+                  name="time-format"
+                  class="flex-1"
+                />
+              </div>
 
+              <div class="flex items-center justify-between mt-5 pt-5 mb-2 border-t border-theme-line-separator border-dashed">
+                <div class="mr-2">
+                  <h5 class="mb-2">
+                    {{ $t('COMMON.AVATAR') }}
+                  </h5>
+                  <p class="text-theme-page-text-light">
+                    {{ $t('PAGES.PROFILE_NEW.STEP1.AVATAR') }}
+                  </p>
+                </div>
                 <SelectionAvatar
-                  :max-visible-items="2"
                   :selected="schema.avatar"
+                  :extra-items="[{
+                    title: $t('PAGES.PROFILE_NEW.STEP1.NO_AVATAR'),
+                    textContent: schema.name,
+                    onlyLetter: true
+                  }]"
                   @select="selectAvatar"
                 />
               </div>
@@ -83,57 +104,30 @@
             :is-back-visible="true"
             :is-next-enabled="!$v.step2.$invalid"
             :is-disabled="step < 2"
-            :title="$t('COMMON.NETWORK')"
+            :title="$t('PAGES.PROFILE_NEW.STEP2.TITLE')"
             @back="moveTo(1)"
             @next="moveTo(3)"
           >
-            <div class="flex flex-row h-full w-full py-2">
+            <div class="flex flex-col">
               <!-- Show the two default networks, and a button to load more -->
-              <div
-                v-for="network in defaultNetworks"
-                :key="network.id"
-              >
-                <div
-                  :title="network.title"
-                  :class="{
-                    'svg-button--selected': selectedNetwork && selectedNetwork.id === network.id,
-                    'rounded-l-lg': first.id === network.id,
-                    'rounded-r-lg': last.id === network.id,
-                  }"
-                  class="svg-button w-30 h-30 text-center text-theme-page-text"
-                  @click="selectNetwork(network)"
-                >
-                  <div
-                    class="flex items-center justify-center"
-                  >
-                    <img
-                      class="w-22 h-22 p-4"
-                      :src="`${assets_loadImage(network.svg)}`"
-                    >
-                  </div>
-                  <span class="text-theme-page-text font-semibold">
-                    {{ network.textContent }}
-                  </span>
-                </div>
-              </div>
-              <div
-                v-if="networks.length > defaultNetworks.length"
-                class="flex items-center ml-3"
-              >
-                <ButtonModal
-                  class="rounded-lg w-18 h-18 border-2 cursor-pointer rounded-lg hover:shadow transition text-center text-4xl text-center p-1 align-middle bg-theme-button text-theme-option-button-text hover:text-theme-button-text border-transparent"
-                  icon="point"
-                  label=""
-                >
-                  <template slot-scope="{ toggle, isOpen }">
-                    <NetworkSelectionModal
-                      v-if="isOpen"
-                      :toggle="toggle"
-                      @cancel="toggle"
-                      @selected="selectNetworkFromModal"
-                    />
-                  </template>
-                </ButtonModal>
+              <SelectionNetwork
+                :selected="selectedNetwork"
+                :networks="defaultNetworks"
+                @select="selectNetwork"
+              />
+              <div v-if="availableCustomNetworks.length">
+                <p class="mt-5 mb-1 text-theme-page-text font-semibold">
+                  {{ $t('PAGES.PROFILE_NEW.STEP2.CUSTOM_NETWORK') }}
+                </p>
+                <p class="text-theme-page-text-light mb-5">
+                  {{ $t('PAGES.PROFILE_NEW.STEP2.CUSTOM_NETWORK_EXPLAIN') }}
+                </p>
+                <SelectionNetwork
+                  :selected="selectedNetwork"
+                  :networks="availableCustomNetworks"
+                  :is-custom="true"
+                  @select="selectNetwork"
+                />
               </div>
             </div>
           </MenuStepItem>
@@ -143,31 +137,52 @@
             :is-back-visible="true"
             :is-next-enabled="!$v.schema.$invalid"
             :is-disabled="step < 3"
-            :title="$t('COMMON.APPEARANCE')"
+            :title="$t('PAGES.PROFILE_NEW.STEP3.TITLE')"
             @back="moveTo(2)"
             @next="create"
           >
             <div class="flex flex-col h-full w-full justify-around">
-              <h5 class="mb-2">
-                {{ $t('COMMON.SELECT_THEME') }}
-              </h5>
+              <div class="flex items-center justify-between mb-5 mt-2">
+                <div>
+                  <h5 class="mb-2">
+                    {{ $t('COMMON.IS_MARKET_CHART_ENABLED') }}
+                  </h5>
+                  <p class="text-theme-page-text-light">
+                    {{ $t('PAGES.PROFILE_NEW.STEP3.MARKET_CHART') }}
+                  </p>
+                </div>
+                <ButtonSwitch
+                  :is-active="isMarketChartEnabled"
+                  @change="selectIsMarketChartEnabled"
+                />
+              </div>
 
-              <SelectionTheme
-                :max-visible-items="2"
-                :selected="theme"
-                class="mb-5"
-                @select="selectTheme"
-              />
+              <div class="flex items-center justify-between mb-5 mt-2">
+                <div>
+                  <h5 class="mb-2">
+                    {{ $t('COMMON.THEME') }}
+                  </h5>
+                  <p class="text-theme-page-text-light">
+                    {{ $t('PAGES.PROFILE_NEW.STEP3.THEME') }}
+                  </p>
+                </div>
+                <SelectionTheme v-model="theme" />
+              </div>
 
-              <h5 class="mb-2">
-                {{ $t('COMMON.SELECT_BACKGROUND') }}
-              </h5>
-
-              <SelectionBackground
-                :max-visible-items="2"
-                :selected="background"
-                @select="selectBackground"
-              />
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="mb-2">
+                    {{ $t('COMMON.BACKGROUND') }}
+                  </h5>
+                  <p class="text-theme-page-text-light">
+                    {{ $t('PAGES.PROFILE_NEW.STEP3.BACKGROUND') }}
+                  </p>
+                </div>
+                <SelectionBackground
+                  :selected="background"
+                  @select="selectBackground"
+                />
+              </div>
             </div>
           </MenuStepItem>
         </MenuStep>
@@ -177,45 +192,33 @@
 </template>
 
 <script>
-import { BIP39, I18N, NETWORKS } from '@config'
+import { BIP39, NETWORKS } from '@config'
 import Profile from '@/models/profile'
-import { ButtonModal } from '@/components/Button'
-import { NetworkSelectionModal } from '@/components/Network'
+import { ButtonSwitch } from '@/components/Button'
 import { MenuStep, MenuStepItem } from '@/components/Menu'
-import { InputSelect, InputText } from '@/components/Input'
-import { SelectionAvatar, SelectionBackground, SelectionTheme } from '@/components/Selection'
+import { InputLanguage, InputSelect, InputText } from '@/components/Input'
+import { SelectionAvatar, SelectionBackground, SelectionNetwork, SelectionTheme } from '@/components/Selection'
 
 export default {
   name: 'ProfileNew',
 
   components: {
-    ButtonModal,
-    NetworkSelectionModal,
-    SelectionAvatar,
-    SelectionBackground,
-    SelectionTheme,
+    ButtonSwitch,
+    InputLanguage,
+    InputSelect,
+    InputText,
     MenuStep,
     MenuStepItem,
-    InputSelect,
-    InputText
+    SelectionAvatar,
+    SelectionBackground,
+    SelectionNetwork,
+    SelectionTheme
   },
 
   schema: Profile.schema,
 
   data: () => ({
     step: 1,
-    backgroundImages: {
-      true: {
-        1: 'pages/profile-new/background-step-1-dark.png',
-        2: 'pages/profile-new/background-step-2-dark.png',
-        3: 'pages/profile-new/background-step-3-dark.png'
-      },
-      false: {
-        1: 'pages/profile-new/background-step-1.png',
-        2: 'pages/profile-new/background-step-2.png',
-        3: 'pages/profile-new/background-step-3.png'
-      }
-    },
     selectedNetwork: null
   }),
 
@@ -238,7 +241,7 @@ export default {
     },
     bip39Language: {
       get () {
-        return this.$store.getters['session/bip39Language'] || 'english'
+        return this.$store.getters['session/bip39Language'] || BIP39.defaultLanguage
       },
       set (bip39language) {
         this.selectBip39Language(bip39language)
@@ -252,6 +255,14 @@ export default {
         this.selectCurrency(currency)
       }
     },
+    isMarketChartEnabled: {
+      get () {
+        return this.$store.getters['session/isMarketChartEnabled']
+      },
+      set (isMarketChartEnabled) {
+        this.selectIsMarketChartEnabled(isMarketChartEnabled)
+      }
+    },
     theme: {
       get () {
         return this.$store.getters['session/theme']
@@ -260,14 +271,16 @@ export default {
         this.selectTheme(theme)
       }
     },
+    timeFormat: {
+      get () {
+        return this.$store.getters['session/timeFormat'] || 'Default'
+      },
+      set (timeFormat) {
+        this.selectTimeFormat(timeFormat)
+      }
+    },
     currencies () {
       return this.$store.getters['market/currencies']
-    },
-    languages () {
-      return I18N.enabledLocales.reduce((all, locale) => {
-        all[locale] = this.$t(`LANGUAGES.${locale}`)
-        return all
-      }, {})
     },
     bip39Languages () {
       return BIP39.languages.reduce((all, language) => {
@@ -276,28 +289,27 @@ export default {
         return all
       }, {})
     },
-    networks () {
-      return this.$store.getters['network/all']
+    timeFormats () {
+      return ['Default', '12h', '24h'].reduce((all, format) => {
+        all[format] = this.$t(`TIME_FORMAT.${format.toUpperCase()}`)
+        return all
+      }, {})
     },
     defaultNetworks () {
-      return NETWORKS.map(network => {
-        return {
-          id: network.id,
-          title: network.description,
-          textContent: network.title,
-          svg: `networks/${network.id}.svg`
-        }
-      })
+      return NETWORKS.map(network => network)
     },
-    first () {
-      return this.defaultNetworks[0]
+    customNetworks () {
+      return this.$store.getters['network/customNetworks']
     },
-    last () {
-      return this.defaultNetworks[this.defaultNetworks.length - 1]
+    availableCustomNetworks: {
+      get () {
+        return Object.values(this.customNetworks)
+      },
+      cache: false
     },
     nameError () {
       if (this.$v.schema.name.$dirty && this.$v.schema.name.$invalid) {
-        if (!this.$v.schema.name.doesNotExists) {
+        if (!this.$v.schema.name.doesNotExist) {
           return this.$t('VALIDATION.NAME.DUPLICATED', [this.schema.name])
         } else if (!this.$v.schema.name.schemaMaxLength) {
           return this.$t('VALIDATION.NAME.MAX_LENGTH', [Profile.schema.properties.name.maxLength])
@@ -310,13 +322,18 @@ export default {
     }
   },
 
-  // Reuse the settings of the current profile
-  // Or get defaults
+  /**
+   * Reuse the settings of the current profile every time the page is created
+   */
   created () {
+    this.selectNetwork(this.defaultNetworks.find(network => network.id === 'phantom.mainnet'))
     this.schema.background = this.background
-    this.schema.language = this.language
+    this.schema.bip39Language = this.bip39Language
     this.schema.currency = this.currency
+    this.schema.isMarketChartEnabled = this.isMarketChartEnabled
+    this.schema.language = this.language
     this.schema.theme = this.theme
+    this.schema.timeFormat = this.timeFormat
   },
 
   destroyed () {
@@ -375,9 +392,19 @@ export default {
       toggle()
     },
 
+    async selectIsMarketChartEnabled (isMarketChartEnabled) {
+      this.schema.isMarketChartEnabled = isMarketChartEnabled
+      await this.$store.dispatch('session/setIsMarketChartEnabled', isMarketChartEnabled)
+    },
+
     async selectTheme (theme) {
       this.schema.theme = theme
       await this.$store.dispatch('session/setTheme', theme)
+    },
+
+    async selectTimeFormat (timeFormat) {
+      this.schema.timeFormat = timeFormat
+      await this.$store.dispatch('session/setTimeFormat', timeFormat)
     }
   },
 
@@ -386,7 +413,7 @@ export default {
     step2: ['schema.networkId'],
     schema: {
       name: {
-        doesNotExists (value) {
+        doesNotExist (value) {
           return !this.$store.getters['profile/doesExist'](value)
         }
       }
@@ -396,12 +423,8 @@ export default {
 </script>
 
 <style scoped>
-/* To display the images scaled to the size of the button */
-.ProfileNew__instructions {
-  background-size: cover;
-  background-position: center center;
-}
-.ProfileNew .svg-button--selected > span, .svg-button--selected > img {
-  color: #fff;
+.ProfileNew__time-format-container {
+  /* To produce the exact same width  (.pr-5 class / 2) */
+  padding-right: 0.625rem
 }
 </style>

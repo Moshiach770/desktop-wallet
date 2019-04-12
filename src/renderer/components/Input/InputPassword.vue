@@ -26,12 +26,12 @@
 
       <button
         :title="$t(passwordIsVisible ? 'PASSWORD_INPUT.HIDE' : 'PASSWORD_INPUT.SHOW')"
-        class="InputPassword__visibility-button flex flex-no-shrink text-grey-dark hover:text-blue mr-2"
+        class="InputPassword__visibility-button flex flex-no-shrink text-grey-dark hover:text-blue focus:text-blue mr-2"
         type="button"
         @click="toggleVisible"
       >
         <SvgIcon
-          :name="passwordIsVisible ? 'password-hide' : 'password-show'"
+          :name="passwordIsVisible ? 'passphrase-hide' : 'passphrase-show'"
           view-box="0 0 20 20"
         />
       </button>

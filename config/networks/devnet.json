@@ -1,25 +1,62 @@
 {
-  "id": "ark.devnet",
-  "name": "ARK Devnet",
-  "title": "ARK Devnet",
-  "server": "https://dexplorer.ark.io:8443",
-  "description": "Devnet is an alternative blockchain used for testing.",
-  "imagePath": "networks/ark.devnet.svg",
+  "id": "phantom.devnet",
+  "name": "PHANTOM Devnet",
+  "title": "PHANTOM Devnet",
+  "server": "https://dexplorer.phantom.io:8443",
+  "description": "The PHANTOM Devnet is only used for R&D by engineers.",
+  "imagePath": "networks/phantom.devnet.svg",
   "apiVersion": 2,
   "slip44": "1",
   "market": {
     "enabled": false,
     "ticker": null
   },
+  "feeStatistics": [
+    {
+      "type": 0,
+      "fees": {
+        "avgFee": 10000000,
+        "maxFee": 10000000,
+        "minFee": 10000000
+      }
+    },
+    {
+      "type": 1,
+      "fees": {
+        "avgFee": 500000000,
+        "maxFee": 500000000,
+        "minFee": 500000000
+      }
+    },
+    {
+      "type": 2,
+      "fees": {
+        "avgFee": 2500000000,
+        "maxFee": 2500000000,
+        "minFee": 2500000000
+      }
+    },
+    {
+      "type": 3,
+      "fees": {
+        "avgFee": 100000000,
+        "maxFee": 100000000,
+        "minFee": 100000000
+      }
+    }
+  ],
   "constants": {
     "activeDelegates": 51,
     "epoch": "2017-03-21T13:00:00.000Z"
   },
+  "vendorField": {
+    "maxLength": 64
+  },
   "nethash": "2a44f340d76ffc3df204c5f38cd355b7496c9065a1ade2ef92071436bd72e867",
-  "explorer": "https://dexplorer.ark.io",
+  "explorer": "https://dexplorer.phantom.io",
   "token": "DARK",
   "subunit": "darktoshi",
-  "symbol": "DѦ",
+  "symbol": "Dⓟ",
   "fractionDigits": 8,
   "version": 30,
   "wif": 170,

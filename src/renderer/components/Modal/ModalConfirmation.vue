@@ -2,7 +2,8 @@
   <ModalWindow
     :container-classes="containerClasses"
     :title="title"
-    @close="emitCancel"
+    :portal-target="portalTarget"
+    @close="emitClose"
   >
     <section class="ModalConfirmation__container flex flex-col">
       <div class="mb-6">
@@ -88,12 +89,21 @@ export default {
       default () {
         return this.$t('MODAL_CONFIRMATION.TITLE')
       }
+    },
+    portalTarget: {
+      type: String,
+      required: false,
+      default: 'modal'
     }
   },
 
   methods: {
     emitCancel () {
       this.$emit('cancel')
+    },
+
+    emitClose () {
+      this.$emit('close')
     },
 
     emitContinue () {

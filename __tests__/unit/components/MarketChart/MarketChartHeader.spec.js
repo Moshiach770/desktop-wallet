@@ -8,7 +8,7 @@ const mocks = {
   $store: {
     getters: {
       'session/currency': 'USD',
-      'session/network': { token: 'ARK' }
+      'session/network': { token: 'XPS' }
     }
   }
 }
@@ -39,7 +39,7 @@ describe('MarketChartHeader', () => {
       },
       mocks
     })
-    const find = wrapper.find('.MarketChartHeader__button')
+    const find = wrapper.find('.MarketChartHeader__button:enabled')
     find.trigger('click')
   })
 })

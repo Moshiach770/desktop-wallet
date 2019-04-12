@@ -1,22 +1,34 @@
 <template>
-  <div class="ProfileEdition relative bg-theme-feature rounded-lg">
-    <main class="flex flex-row h-full">
+  <div class="ProfileEdition relative">
+    <main class="flex h-full">
       <div
-        :style="`background-image: url('${assets_loadImage(backgroundImage)}')`"
-        class="ProfileEdition__instructions w-3/5 background-image"
+        class="ProfileNew__instructions theme-dark bg-theme-feature text-theme-page-instructions-text hidden lg:flex flex-1 mr-4 rounded-lg overflow-y-auto"
       >
-        <div class="instructions-text">
-          <h3 class="mb-2 text-theme-page-instructions-text">
+        <div class="m-auto w-3/5 text-center flex flex-col items-center justify-center">
+          <h1 class="text-inherit">
             {{ $t(`PAGES.PROFILE_EDITION.TAB_${tab.toUpperCase()}.INSTRUCTIONS.HEADER`) }}
-          </h3>
-          <p>
+          </h1>
+          <p class="text-center py-2 leading-normal">
             {{ $t(`PAGES.PROFILE_EDITION.TAB_${tab.toUpperCase()}.INSTRUCTIONS.TEXT`) }}
           </p>
+
+          <div class="relative w-full xl:w-4/5 mt-10">
+            <img
+              :src="assets_loadImage(instructionsImage)"
+              :title="$t(`PAGES.PROFILE_EDITION.TAB_${tab.toUpperCase()}.INSTRUCTIONS.HEADER`)"
+            >
+            <h2
+              v-if="isProfileTab"
+              class="ProfileNew__instructions__name opacity-75 absolute pin-x z-10 hidden xl:block"
+            >
+              {{ name }}
+            </h2>
+          </div>
         </div>
       </div>
 
-      <div class="w-2/5">
-        <MenuTab :tab="tab">
+      <div class="flex-none w-full lg:max-w-sm bg-theme-feature rounded-lg overflow-y-auto">
+        <MenuTab v-model="tab">
           <MenuTabItem
             :label="$t('PAGES.PROFILE_EDITION.TAB_PROFILE.TITLE')"
             tab="profile"
@@ -51,7 +63,7 @@
 
                 <button
                   :disabled="$v.modified.name.$dirty && $v.modified.name.$invalid"
-                  class="ProfileEdition__name__toggle ml-2 cursor-pointer text-grey hover:text-blue inline-flex"
+                  class="ProfileEdition__name__toggle ml-2 cursor-pointer text-grey hover:text-blue focus:text-blue inline-flex"
                   @click="toggleIsNameEditable"
                 >
                   <SvgIcon
@@ -61,7 +73,10 @@
                 </button>
               </ListDividedItem>
 
-              <ListDividedItem :label="$t('COMMON.LANGUAGE')">
+              <ListDividedItem
+                :label="$t('COMMON.LANGUAGE')"
+                class="ProfileEdition__language"
+              >
                 <MenuDropdown
                   :class="{
                     'ProfileEdition__field--modified': modified.language && modified.language !== profile.language
@@ -70,7 +85,42 @@
                   :value="language"
                   :position="['-50%', '0%']"
                   @select="selectLanguage"
-                />
+                >
+                  <div
+                    slot="item"
+                    slot-scope="itemScope"
+                    class="flex flex-row space-between"
+                  >
+                    <img
+                      :src="flagImage(itemScope.value)"
+                      :title="itemScope.item"
+                      class="ProfileEdition__language__item__flag mr-2"
+                    >
+                    <span class="font-semibold">
+                      {{ itemScope.item }}
+                    </span>
+                  </div>
+
+                  <div
+                    slot="handler"
+                    slot-scope="handlerScope"
+                  >
+                    <MenuDropdownHandler
+                      :value="handlerScope.activeValue"
+                      :item="handlerScope.item"
+                      :placeholder="handlerScope.placeholder"
+                      :prefix="handlerScope.prefix"
+                      :icon-disabled="handlerScope.isOnlySelectedItem"
+                    >
+                      <img
+                        :src="flagImage(handlerScope.value)"
+                        :title="handlerScope.item"
+                        class="ProfileEdition__language__handler__flag mr-1"
+                      >
+                      {{ handlerScope.item }}
+                    </MenuDropdownHandler>
+                  </div>
+                </MenuDropdown>
               </ListDividedItem>
 
               <ListDividedItem :label="$t('COMMON.BIP39_LANGUAGE')">
@@ -97,6 +147,18 @@
                 />
               </ListDividedItem>
 
+              <ListDividedItem :label="$t('COMMON.TIME_FORMAT')">
+                <MenuDropdown
+                  :class="{
+                    'ProfileEdition__field--modified': modified.timeFormat && modified.timeFormat !== profile.timeFormat
+                  }"
+                  :items="timeFormats"
+                  :value="timeFormat"
+                  :position="['-50%', '0%']"
+                  @select="selectTimeFormat"
+                />
+              </ListDividedItem>
+
               <ListDividedItem
                 v-if="!hasWallets"
                 :label="$t('COMMON.NETWORK')"
@@ -117,6 +179,11 @@
                 class="ProfileEdition__avatar"
               >
                 <SelectionAvatar
+                  :extra-items="[{
+                    title: $t('PAGES.PROFILE_NEW.STEP1.NO_AVATAR'),
+                    textContent: name,
+                    onlyLetter: true
+                  }]"
                   :enable-modal="true"
                   :max-visible-items="3"
                   :selected="avatar"
@@ -124,6 +191,16 @@
                 />
               </ListDividedItem>
             </ListDivided>
+
+            <footer class="ProfileEdition__footer pb-10">
+              <button
+                :disabled="!isModified || isNameEditable"
+                class="blue-button"
+                @click="save"
+              >
+                {{ $t('COMMON.SAVE') }}
+              </button>
+            </footer>
           </MenuTabItem>
 
           <MenuTabItem
@@ -133,18 +210,30 @@
           >
             <ListDivided>
               <ListDividedItem
-                :label="$t('COMMON.SELECT_THEME')"
-                class="ProfileEdition__theme"
+                :label="$t('COMMON.IS_MARKET_CHART_ENABLED')"
+                :item-label-class="!isMarketEnabled ? 'opacity-50' : ''"
+                :item-value-class="!isMarketEnabled ? 'opacity-50 cursor-not-allowed' : ''"
+                class="ProfileEdition__market-chart"
               >
-                <SelectionTheme
-                  :max-visible-items="4"
-                  :selected="theme"
-                  @select="selectTheme"
+                <ButtonSwitch
+                  :is-disabled="!isMarketEnabled"
+                  :is-active="isMarketChartEnabled"
+                  @change="selectIsMarketChartEnabled"
                 />
               </ListDividedItem>
 
               <ListDividedItem
-                :label="$t('COMMON.SELECT_BACKGROUND')"
+                :label="$t('COMMON.THEME')"
+                class="ProfileEdition__theme"
+              >
+                <SelectionTheme
+                  :value="theme"
+                  @input="selectTheme"
+                />
+              </ListDividedItem>
+
+              <ListDividedItem
+                :label="$t('COMMON.BACKGROUND')"
                 class="ProfileEdition__background"
               >
                 <SelectionBackground
@@ -154,30 +243,39 @@
                 />
               </ListDividedItem>
             </ListDivided>
+
+            <footer class="ProfileEdition__footer pb-10">
+              <button
+                :disabled="!isModified || isNameEditable"
+                class="blue-button"
+                @click="save"
+              >
+                {{ $t('COMMON.SAVE') }}
+              </button>
+            </footer>
           </MenuTabItem>
         </MenuTab>
-
-        <!-- TODO at the bottom ? -->
-        <footer class="ProfileEdition__footer mt-3 p-10">
-          <button
-            :disabled="!isModified || isNameEditable"
-            class="blue-button"
-            @click="save"
-          >
-            {{ $t('COMMON.SAVE') }}
-          </button>
-        </footer>
       </div>
     </main>
+
+    <ProfileLeavingConfirmation
+      v-if="routeLeaveCallback"
+      :profile="profile"
+      @close="onStopLeaving"
+      @ignore="onLeave(false)"
+      @save="onLeave(true)"
+    />
   </div>
 </template>
 
 <script>
-import { capitalize, isEmpty } from 'lodash'
+import { isEmpty } from 'lodash'
 import { BIP39, I18N } from '@config'
+import { ButtonSwitch } from '@/components/Button'
 import { InputText } from '@/components/Input'
 import { ListDivided, ListDividedItem } from '@/components/ListDivided'
-import { MenuDropdown, MenuTab, MenuTabItem } from '@/components/Menu'
+import { MenuDropdown, MenuDropdownHandler, MenuTab, MenuTabItem } from '@/components/Menu'
+import { ProfileLeavingConfirmation } from '@/components/Profile'
 import { SelectionAvatar, SelectionBackground, SelectionTheme } from '@/components/Selection'
 import SvgIcon from '@/components/SvgIcon'
 import Profile from '@/models/profile'
@@ -190,12 +288,15 @@ export default {
   name: 'ProfileEdition',
 
   components: {
+    ButtonSwitch,
     InputText,
     ListDivided,
     ListDividedItem,
     MenuTab,
     MenuTabItem,
     MenuDropdown,
+    MenuDropdownHandler,
+    ProfileLeavingConfirmation,
     SelectionAvatar,
     SelectionBackground,
     SelectionTheme,
@@ -208,14 +309,22 @@ export default {
       name: '',
       language: '',
       bip39Language: '',
-      currency: ''
+      currency: '',
+      timeFormat: ''
     },
+    routeLeaveCallback: null,
     tab: 'profile'
   }),
 
   computed: {
     currencies () {
       return this.$store.getters['market/currencies']
+    },
+    timeFormats () {
+      return ['Default', '12h', '24h'].reduce((all, format) => {
+        all[format] = this.$t(`TIME_FORMAT.${format.toUpperCase()}`)
+        return all
+      }, {})
     },
     languages () {
       return I18N.enabledLocales.reduce((all, locale) => {
@@ -244,7 +353,7 @@ export default {
 
     isModified () {
       return Object.keys(this.modified).some(property => {
-        if (this.modified[property]) {
+        if (property === 'avatar' || this.modified.hasOwnProperty(property)) {
           return this.modified[property] !== this.profile[property]
         }
         return false
@@ -269,11 +378,14 @@ export default {
     currency () {
       return this.modified.currency || this.profile.currency
     },
+    timeFormat () {
+      return this.modified.timeFormat || this.profile.timeFormat
+    },
     language () {
       return this.modified.language || this.profile.language
     },
     bip39Language () {
-      return this.modified.bip39Language || this.profile.bip39Language || 'english'
+      return this.modified.bip39Language || this.profile.bip39Language || BIP39.defaultLanguage
     },
     name () {
       return this.modified.name || this.profile.name
@@ -285,12 +397,22 @@ export default {
     theme () {
       return this.modified.theme || this.profile.theme
     },
-    backgroundImage () {
-      return `pages/profile-new/background-step-3${this.session_hasDarkTheme ? '-dark' : ''}.png`
+    isMarketChartEnabled () {
+      return this.modified.isMarketChartEnabled || this.profile.isMarketChartEnabled
+    },
+    isMarketEnabled () {
+      return this.session_network && this.session_network.market && this.session_network.market.enabled
+    },
+    isProfileTab () {
+      return this.tab === 'profile'
+    },
+    instructionsImage () {
+      const name = this.isProfileTab ? 'step-1' : 'step-3'
+      return `pages/profile-new/${name}.svg`
     },
     nameError () {
       if (this.$v.modified.name.$dirty && this.$v.modified.name.$invalid) {
-        if (!this.$v.modified.name.doesNotExists) {
+        if (!this.$v.modified.name.doesNotExist) {
           return this.$t('VALIDATION.NAME.DUPLICATED', [this.modified.name])
         } else if (!this.$v.modified.name.maxLength) {
           return this.$t('VALIDATION.NAME.MAX_LENGTH', [Profile.schema.properties.name.maxLength])
@@ -310,8 +432,13 @@ export default {
     })
   },
 
-  beforeDestroy () {
-    this.$store.dispatch('session/load')
+  beforeRouteLeave (to, from, next) {
+    if (this.isModified) {
+      // Capture the callback to trigger it when user has decided to update or not the profile
+      this.routeLeaveCallback = next
+    } else {
+      next()
+    }
   },
 
   mounted () {
@@ -319,9 +446,28 @@ export default {
     this.modified.language = this.profile.language
     this.modified.bip39Language = this.profile.bip39Language
     this.modified.currency = this.profile.currency
+    this.modified.timeFormat = this.profile.timeFormat || 'Default'
   },
 
   methods: {
+    onStopLeaving () {
+      this.routeLeaveCallback = null
+    },
+
+    async onLeave (hasToSave) {
+      if (hasToSave) {
+        await this.updateProfile()
+      } else {
+        this.$store.dispatch('session/load', this.session_profile.id)
+      }
+
+      this.routeLeaveCallback()
+    },
+
+    flagImage (language) {
+      return this.assets_loadImage(`flags/${language}.svg`)
+    },
+
     toggleIsNameEditable () {
       if (!this.nameError || !this.isNameEditable) {
         if (!this.isNameEditable && !this.modified.name) {
@@ -331,11 +477,15 @@ export default {
       }
     },
 
-    async save () {
+    async updateProfile () {
       await this.$store.dispatch('profile/update', {
         ...this.profile,
         ...this.modified
       })
+    },
+
+    async save () {
+      await this.updateProfile()
 
       this.$router.push({ name: 'profiles' })
     },
@@ -350,6 +500,10 @@ export default {
 
     selectCurrency (currency) {
       this.__updateSession('currency', currency)
+    },
+
+    selectTimeFormat (format) {
+      this.__updateSession('timeFormat', format)
     },
 
     async selectLanguage (language) {
@@ -368,6 +522,10 @@ export default {
       this.__updateSession('theme', theme)
     },
 
+    async selectIsMarketChartEnabled (isMarketChartEnabled) {
+      this.__updateSession('isMarketChartEnabled', isMarketChartEnabled)
+    },
+
     setName (event) {
       this.__updateSession('name', this.modified.name)
       this.$v.modified.name.$touch()
@@ -377,16 +535,20 @@ export default {
       this.$set(this.modified, propertyName, value)
 
       if (this.isCurrentProfile) {
-        const action = `session/set${capitalize(propertyName)}`
+        const action = `session/set${this.capitalizeFirst(propertyName)}`
         await this.$store.dispatch(action, value)
       }
+    },
+
+    capitalizeFirst (value) {
+      return value.charAt(0).toUpperCase() + value.slice(1)
     }
   },
 
   validations: {
     modified: {
       name: {
-        doesNotExists (value) {
+        doesNotExist (value) {
           const otherProfile = this.$store.getters['profile/doesExist'](value)
           return !otherProfile || otherProfile.id === this.profile.id
         },
@@ -411,8 +573,31 @@ export default {
 </style>
 
 <style lang="postcss">
+.ProfileNew__instructions__name {
+  bottom: 3.3rem;
+}
 .ProfileEdition .MenuTab .MenuTab__nav__item {
   @apply .px-10 .py-6
+}
+.ProfileEdition .MenuTab__content {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.ProfileEdition__language .MenuDropdown__container {
+  min-width: 200px
+}
+.ProfileEdition__language .MenuDropdownItem__container {
+  @apply .mx-2 .px-2
+}
+.ProfileEdition__language .MenuDropdownItem__container {
+  @apply .break-normal
+}
+.ProfileEdition__language__item__flag {
+  height: 18px
+}
+.ProfileEdition__language__handler__flag {
+  height: 12px
 }
 
 .ProfileEdition__name .ProfileEdition__field--modified,
@@ -434,17 +619,6 @@ export default {
 }
 .ProfileEdition__name .ListDividedItem__value .InputText .InputField__wrapper {
   height: 0
-}
-
-.ProfileEdition__avatar.ListDividedItem,
-.ProfileEdition__background.ListDividedItem,
-.ProfileEdition__theme.ListDividedItem {
-  @apply .flex-col
-}
-.ProfileEdition__avatar .ListDividedItem__value,
-.ProfileEdition__background .ListDividedItem__value,
-.ProfileEdition__theme .ListDividedItem__value {
-  @apply .pt-4
 }
 .ProfileEdition__avatar .InputGrid__container {
   grid-template-columns: repeat(4, 4rem) !important;

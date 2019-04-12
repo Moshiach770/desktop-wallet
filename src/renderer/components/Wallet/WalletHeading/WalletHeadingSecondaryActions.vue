@@ -5,12 +5,19 @@
   >
     <ButtonModal
       :class="buttonStyle"
-      :label="$t('WALLET_HEADING.ACTIONS.WALLET_NAME')"
+      :label="currentWallet.isContact ? $t('WALLET_HEADING.ACTIONS.CONTACT_NAME') : $t('WALLET_HEADING.ACTIONS.WALLET_NAME')"
       icon="name"
     >
       <template slot-scope="{ toggle, isOpen }">
+        <ContactRenameModal
+          v-if="currentWallet.isContact && isOpen"
+          :wallet="currentWallet"
+          @cancel="toggle"
+          @renamed="toggle"
+        />
+
         <WalletRenameModal
-          v-if="isOpen"
+          v-if="!currentWallet.isContact && isOpen"
           :wallet="currentWallet"
           @cancel="toggle"
           @renamed="toggle"
@@ -19,7 +26,7 @@
     </ButtonModal>
 
     <ButtonModal
-      v-show="!currentWallet.isContact"
+      v-show="!currentWallet.isContact && !currentWallet.isDelegate"
       :class="buttonStyle"
       :label="$t('WALLET_HEADING.ACTIONS.REGISTER_DELEGATE')"
       icon="register-delegate"
@@ -35,7 +42,7 @@
     </ButtonModal>
 
     <ButtonModal
-      v-show="!currentWallet.isContact && !currentWallet.isLedger"
+      v-show="!currentWallet.isContact && !currentWallet.isLedger && !currentWallet.secondPublicKey"
       :class="buttonStyle"
       :label="$t('WALLET_HEADING.ACTIONS.SECOND_PASSPHRASE')"
       icon="2nd-passphrase"
@@ -70,6 +77,7 @@
 
 <script>
 import { ButtonModal } from '@/components/Button'
+import { ContactRenameModal } from '@/components/Contact'
 import { WalletRenameModal, WalletRemovalConfirmation } from '@/components/Wallet'
 import { TransactionModal } from '@/components/Transaction'
 
@@ -78,6 +86,7 @@ export default {
 
   components: {
     ButtonModal,
+    ContactRenameModal,
     WalletRenameModal,
     WalletRemovalConfirmation,
     TransactionModal
@@ -85,7 +94,7 @@ export default {
 
   computed: {
     buttonStyle () {
-      return 'option-button whitespace-no-wrap mr-2 px-3 py-2'
+      return 'option-heading-button whitespace-no-wrap mr-2 px-3 py-2'
     },
 
     currentWallet () {

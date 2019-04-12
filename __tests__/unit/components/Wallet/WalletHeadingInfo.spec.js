@@ -11,12 +11,14 @@ const network = {
   fractionDigits: 8,
   market: {
     enabled: false
-  }
+  },
+  knownWallets: []
 }
 
 const sampleWalletData = {
   address: 'AJAAfMJj1w6U5A3t6BGA7NYZsaVve6isMm',
-  balance: 797.8921
+  balance: 797.8921,
+  profileId: 'abc'
 }
 
 const alternativeCurrency = 'EUR'
@@ -64,7 +66,13 @@ describe('WalletHeadingInfo component', () => {
   it('should display the identicon', () => {
     const identicon = wrapper.find('.WalletHeading__identicon')
 
-    expect(identicon.html()).toContain('class="WalletIdenticon"')
+    expect(identicon.html()).toContain('class="WalletIdenticon')
+  })
+
+  it('should not allow selecting the identicon badge', () => {
+    const identicon = wrapper.find('.WalletHeading__identicon')
+
+    expect(identicon.html()).toContain('select-none')
   })
 
   it('should display the address', () => {

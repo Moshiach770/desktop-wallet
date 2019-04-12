@@ -6,7 +6,7 @@
         :size="75"
       />
 
-      <div class="flex flex-col justify-center ml-2">
+      <div class="flex flex-col justify-center pl-4">
         <span class="font-bold">
           {{ $t('SIGN_VERIFY.VERIFY_WALLET') }}
         </span>
@@ -50,16 +50,20 @@
       @mouseover="showTimestamp = message.timestamp"
       @mouseout="showTimestamp = null"
     >
-      <div class="flex flex-row">
-        <div class="font-semibold text-theme-wallet-sign-verify-message-text mr-6 pl-2">
-          <div>{{ $t('SIGN_VERIFY.MESSAGE') }}:</div>
-          <div>{{ $t('SIGN_VERIFY.SIGNATURE') }}:</div>
-        </div>
-        <div>
-          <div class="font-semibold word-break-all">
+      <div class="flex flex-col">
+        <div class="flex items-start">
+          <div class="font-semibold w-30 flex-shrink-none pl-2 text-theme-wallet-sign-verify-message-text">
+            {{ $t('SIGN_VERIFY.MESSAGE') }}:
+          </div>
+          <div class="font-semibold w-full word-break-all">
             {{ message.message }}
           </div>
-          <div class="word-break-all">
+        </div>
+        <div class="flex items-start">
+          <div class="font-semibold w-30 flex-shrink-none pl-2 text-theme-wallet-sign-verify-message-text">
+            {{ $t('SIGN_VERIFY.SIGNATURE') }}:
+          </div>
+          <div class="w-full word-break-all">
             {{ message.signature }}
           </div>
         </div>
@@ -111,12 +115,21 @@ export default {
 
   data: () => ({
     signedMessages: [],
-    showTimestamp: null
+    showTimestamp: null,
+    activeWalletId: null
   }),
 
   computed: {
     currentWallet () {
       return this.wallet_fromRoute
+    }
+  },
+
+  watch: {
+    currentWallet () {
+      if (this.activeWalletId !== this.currentWallet.id) {
+        this.updateSignedMessages()
+      }
     }
   },
 
@@ -131,22 +144,29 @@ export default {
       }
       return value
     },
+
     copyMessage (value) {
       var message = clone(value, false)
       delete message['timestamp']
       delete message['address']
       return JSON.stringify(message)
     },
+
     deleteMessage (value) {
       var message = clone(value, false)
       this.$store.dispatch('wallet/deleteSignedMessage', message)
     },
-    updateSignedMessages () {
+
+    updateSignedMessages (setWalletId = true) {
+      if (setWalletId) {
+        this.activeWalletId = this.currentWallet.id
+      }
       this.signedMessages = this.$store.getters['wallet/signedMessages'](this.currentWallet.address)
     },
+
     onSigned (toggle) {
       toggle()
-      this.updateSignedMessages()
+      this.updateSignedMessages(false)
     }
   }
 }

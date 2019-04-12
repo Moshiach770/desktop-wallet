@@ -8,13 +8,14 @@
     class="AppSidemenu relative bg-transparent"
   >
     <div
-      class="AppSidemenu__container flexify w-full h-full justify-between"
+      class="AppSidemenu__container flexify w-full md:h-full justify-between"
     >
-      <!-- ARK logo -->
+      <!-- PHANTOM logo -->
       <RouterLink
         :title="$t('APP_SIDEMENU.DASHBOARD')"
         :to="{ name: 'dashboard' }"
         class="AppSidemenu__logo bg-red hover:opacity-85 flex justify-center items-center"
+        @click.native="redirect('dashboard')"
       >
         <img src="@/assets/images/ark-logo.png">
       </RouterLink>
@@ -64,18 +65,6 @@
         </div>
 
         <div class="flexify">
-          <!-- Search -->
-          <!-- <MenuNavigationItem
-            id="search"
-            :class="isHorizontal ? 'w-16' : 'h-16'"
-            :is-horizontal="isHorizontal"
-            view-box="0 0 20 20"
-            icon="search"
-            @click="redirect($event)"
-          /> -->
-        </div>
-
-        <div class="flexify">
           <AppSidemenuSettings
             v-if="isSettingsVisible"
             :outside-click="true"
@@ -114,20 +103,27 @@
           <!-- Profile settings -->
           <div
             :class="isHorizontal ? 'ml-2 mr-4 py-3' : 'mt-2 mb-4 px-3'"
-            class="AppSidemenu__avatar__container relative cursor-pointer flex items-center hover:opacity-50"
+            class="AppSidemenu__avatar__container relative cursor-pointer flex items-center justify-center hover:opacity-50"
           >
             <RouterLink
-              :class="isHorizontal ? 'h-12 w-12 bg-no-repeat' : 'h-18 w-18'"
-              :style="session_profile.avatar ? `backgroundImage: url('${assets_loadImage(session_profile.avatar)}')` : ''"
-              :title="$t('APP_SIDEMENU.CURRENT_PROFILE', { profileName: session_profile.name })"
               :to="{ name: 'profiles' }"
-              class="AppSidemenu__avatar flex background-image bg-center bg-no-repeat border-none"
+              class="AppSidemenu__avatar"
             >
-              <SvgIcon
-                class="AppSidemenu__avatar__dots"
-                name="point"
-                view-box="0 0 14 14"
-              />
+              <ProfileAvatar
+                :profile="session_profile"
+                :class="{
+                  'h-12 w-12': session_profile.avatar && isHorizontal,
+                  'h-18 w-18': session_profile.avatar && !isHorizontal
+                }"
+                :title="$t('APP_SIDEMENU.CURRENT_PROFILE', { profileName: session_profile.name })"
+                letter-size="xl"
+              >
+                <SvgIcon
+                  class="AppSidemenu__avatar__dots text-grey-dark"
+                  name="point"
+                  view-box="0 0 14 14"
+                />
+              </ProfileAvatar>
             </RouterLink>
           </div>
         </div>
@@ -137,23 +133,26 @@
 </template>
 
 <script>
+import semver from 'semver'
 import { mapGetters } from 'vuex'
 import releaseService from '@/services/release'
-import { MenuNavigation, MenuNavigationItem } from '@/components/Menu'
 import AppSidemenuSettings from './AppSidemenuSettings'
 import AppSidemenuNetworkStatus from './AppSidemenuNetworkStatus'
 import AppSidemenuImportantNotification from './AppSidemenuImportantNotification'
+import { MenuNavigation, MenuNavigationItem } from '@/components/Menu'
+import { ProfileAvatar } from '@/components/Profile'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
   name: 'AppSidemenu',
 
   components: {
-    MenuNavigation,
-    MenuNavigationItem,
     AppSidemenuSettings,
     AppSidemenuNetworkStatus,
     AppSidemenuImportantNotification,
+    MenuNavigation,
+    MenuNavigationItem,
+    ProfileAvatar,
     SvgIcon
   },
 
@@ -174,11 +173,11 @@ export default {
 
   computed: {
     ...mapGetters({
-      releaseVersion: 'app/latestReleaseVersion',
+      latestReleaseVersion: 'app/latestReleaseVersion',
       unreadAnnouncements: 'announcements/unread'
     }),
     hasNewRelease () {
-      return releaseService.currentVersion !== this.releaseVersion
+      return semver.lt(releaseService.currentVersion, this.latestReleaseVersion || releaseService.currentVersion)
     },
     showUnread () {
       return this.unreadAnnouncements.length > 0
@@ -223,27 +222,34 @@ export default {
 .AppSidemenu__container__scrollable .flexify { @apply flex-none }
 .AppSidemenu__logo { transition: opacity 0.5s; }
 
+.AppSidemenu__avatar__container {
+  transition: opacity 0.5s;
+}
+
 .AppSidemenu--horizontal .AppSidemenu__item { @apply w-16 }
 .AppSidemenu--horizontal .AppSidemenu__logo { @apply p-4 }
 .AppSidemenu--horizontal .AppSidemenu__logo img { @apply h-12 }
 .AppSidemenu--horizontal .flexify { @apply flex flex-row }
 .AppSidemenu--horizontal { @apply h-18; }
+.AppSidemenu--horizontal .AppSidemenu__avatar__dots {
+  @apply absolute p-2 rounded-full bg-theme-feature;
+  right: 0.1rem;
+  bottom: 0.7rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
 
 .AppSidemenu--vertical .AppSidemenu__container__scrollable { @apply rounded-lg py-2 }
 .AppSidemenu--vertical .AppSidemenu__item { @apply h-16 }
-.AppSidemenu--vertical .AppSidemenu__logo { @apply rounded-lg mb-3 px-4 py-5 }
+.AppSidemenu--vertical .AppSidemenu__logo { @apply rounded-lg mb-3 p-5 }
 .AppSidemenu--vertical .AppSidemenu__logo img { @apply w-18 }
 .AppSidemenu--vertical .flexify { @apply flex flex-col }
 .AppSidemenu--vertical { @apply w-22 mx-6 rounded-lg }
-
-.AppSidemenu__avatar__container {
-  transition: opacity 0.5s;
-}
-.AppSidemenu__avatar__dots {
-  @apply absolute p-2 rounded-full bg-theme-feature;
+.AppSidemenu--vertical .AppSidemenu__avatar__dots {
+  @apply absolute p-2 rounded-full bg-theme-feature shadow;
   right: 1rem;
-  bottom: -0.5rem;
-  width: 2rem;
-  height: 2rem;
+  bottom: -0.7rem;
+  width: 1.8rem;
+  height: 1.8rem;
 }
 </style>

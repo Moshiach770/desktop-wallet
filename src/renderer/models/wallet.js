@@ -49,6 +49,13 @@ export default new BaseModel({
     isDelegate: {
       type: 'boolean',
       default: false
+    },
+    isWatchOnly: {
+      type: 'boolean',
+      default: false
+    },
+    vote: {
+      type: ['string', 'null']
     }
   },
   required: ['address', 'name', 'profileId']

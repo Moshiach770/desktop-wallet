@@ -15,7 +15,7 @@
       :is-dirty="$v.model.$dirty"
       :is-disabled="isDisabled"
       :is-focused="isFocused"
-      :is-invalid="isInvalid"
+      :is-invalid="invalid"
       class="InputAddress text-left"
     >
       <div
@@ -62,13 +62,13 @@
 <script>
 import { required } from 'vuelidate/lib/validators'
 import { ButtonModal } from '@/components/Button'
-import { ModalQrCodeScanner } from '@/components/Modal'
+import ModalQrCodeScanner from '@/components/Modal/ModalQrCodeScanner'
 import { MenuDropdown } from '@/components/Menu'
 import Cycled from 'cycled'
 import InputField from './InputField'
 import WalletService from '@/services/wallet'
 import truncate from '@/filters/truncate'
-import _ from 'lodash'
+import { includes, isEmpty, map, orderBy, unionBy } from 'lodash'
 
 export default {
   name: 'InputAddress',
@@ -115,13 +115,20 @@ export default {
     value: {
       type: String,
       required: true
+    },
+    isInvalid: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
   data: vm => ({
     inputValue: vm.value,
     dropdownValue: null,
-    isFocused: false
+    isFocused: false,
+    neoCheckedAddressess: {},
+    notice: null
   }),
 
   computed: {
@@ -132,13 +139,11 @@ export default {
     error () {
       let error = null
 
-      if (this.$v.model.$dirty && !(this.hasSuggestions && this.isFocused)) {
+      if (!this.isDisabled && this.$v.model.$dirty && !(this.hasSuggestions && this.isFocused)) {
         if (!this.$v.model.required) {
           error = this.$t('INPUT_ADDRESS.ERROR.REQUIRED')
         } else if (!this.$v.model.isValid) {
           error = this.$t('INPUT_ADDRESS.ERROR.NOT_VALID')
-        } else if (!this.$v.model.isNotNeoAddress && !this.$v.model.$pending) {
-          error = this.$t('INPUT_ADDRESS.ERROR.NEO_ADDRESS')
         }
       }
 
@@ -146,11 +151,11 @@ export default {
     },
 
     hasSuggestions () {
-      return !_.isEmpty(this.suggestions)
+      return !isEmpty(this.suggestions)
     },
 
-    isInvalid () {
-      return this.$v.model.$dirty && !!this.error
+    invalid () {
+      return this.$v.model.$dirty && (this.isInvalid || !!this.error)
     },
 
     model: {
@@ -164,7 +169,9 @@ export default {
     },
 
     suggestions () {
-      if (!this.currentProfile || !this.showSuggestions) return []
+      if (!this.currentProfile || !this.showSuggestions) {
+        return []
+      }
 
       const ledgerWallets = this.$store.getters['ledger/isConnected'] ? this.$store.getters['ledger/wallets'] : []
       const wallets = [
@@ -173,9 +180,9 @@ export default {
       ]
       const contacts = this.$store.getters['wallet/contactsByProfileId'](this.currentProfile.id)
 
-      const source = _.unionBy(wallets, contacts, 'address')
+      const source = unionBy(wallets, contacts, 'address')
 
-      const addresses = _.map(source, (wallet) => {
+      const addresses = map(source, (wallet) => {
         const address = {
           name: null,
           address: wallet.address
@@ -187,32 +194,24 @@ export default {
         return address
       })
 
-      const results = _.orderBy(addresses, (object) => {
+      const results = orderBy(addresses, (object) => {
         return object.name || object.address.toLowerCase()
       })
 
-      return results.reduce((map, wallet, index) => {
+      return results.reduce((wallets, wallet, index) => {
         const value = wallet.name || wallet.address
         const searchValue = value.toLowerCase()
 
-        if (_.includes(searchValue, this.inputValue.toLowerCase())) {
-          map[wallet.address] = value
+        if (includes(searchValue, this.inputValue.toLowerCase())) {
+          wallets[wallet.address] = value
         }
 
-        return map
+        return wallets
       }, {})
     },
 
     suggestionsKeys () {
       return new Cycled(Object.keys(this.suggestions))
-    },
-
-    notice () {
-      const knownAddress = this.wallet_name(this.inputValue)
-      if (knownAddress) {
-        return this.$t('INPUT_ADDRESS.KNOWN_ADDRESS', { address: knownAddress })
-      }
-      return null
     }
   },
 
@@ -227,10 +226,24 @@ export default {
       }
     },
 
-    inputValue () {
+    async inputValue () {
       this.dropdownValue = null
       if (this.isFocused && this.hasSuggestions) {
         this.openDropdown()
+      }
+
+      if (this.invalid) {
+        this.notice = null
+      } else {
+        const knownAddress = this.wallet_name(this.inputValue)
+
+        if (knownAddress) {
+          this.notice = this.$t('INPUT_ADDRESS.KNOWN_ADDRESS', { address: knownAddress })
+        } else if (await this.checkNeoAddress(this.inputValue)) {
+          this.notice = this.$t('INPUT_ADDRESS.NEO_ADDRESS')
+        } else {
+          this.notice = null
+        }
       }
     }
   },
@@ -250,11 +263,24 @@ export default {
       this.$refs.input.focus()
     },
 
+    /**
+     * Checks if there is a NEO wallet with the same address and memoizes the result
+     * @param {String}
+     * @result {Boolean}
+     */
+    async checkNeoAddress (address) {
+      const wasChecked = this.neoCheckedAddressess.hasOwnProperty(address)
+      if (!wasChecked) {
+        this.neoCheckedAddressess[address] = await WalletService.isNeoAddress(address)
+      }
+      return this.neoCheckedAddressess[address]
+    },
+
     onBlur (evt) {
       // Verifies that the element that generated the blur was a dropdown item
       if (evt.relatedTarget) {
         const classList = evt.relatedTarget.classList || []
-        const isDropdownItem = _.includes(classList, 'MenuDropdownItem__button')
+        const isDropdownItem = includes(classList, 'MenuDropdownItem__button')
 
         if (!isDropdownItem) {
           this.closeDropdown()
@@ -282,7 +308,10 @@ export default {
     },
 
     onEnter () {
-      if (!this.dropdownValue) return
+      if (!this.dropdownValue) {
+        return
+      }
+
       this.model = this.dropdownValue
 
       this.$nextTick(() => {
@@ -331,7 +360,9 @@ export default {
     },
 
     __setSuggestion (value) {
-      if (!this.hasSuggestions) return
+      if (!this.hasSuggestions) {
+        return
+      }
 
       this.dropdownValue = value
       this.$nextTick(() => {
@@ -345,10 +376,6 @@ export default {
       required,
       isValid (value) {
         return WalletService.validateAddress(value, this.pubKeyHash)
-      },
-      async isNotNeoAddress (value) {
-        const result = await WalletService.isNeoAddress(value)
-        return !result
       }
     }
   }

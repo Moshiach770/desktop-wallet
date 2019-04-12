@@ -25,39 +25,40 @@
         }"
         class="ProfileAll__grid__profile flex flex-row w-full"
       >
-        <button
-          :style="`backgroundImage: url('${assets_loadImage(profile.avatar)}')`"
-          :title="profile.name"
-          class="profile-avatar-xl background-image flex cursor-pointer"
+        <ProfileAvatar
+          :profile="profile"
+          letter-size="2xl"
           @click="selectProfile(profile.id)"
         />
 
-        <div class="flex flex-col justify-center">
-          <div class="ProfileAll__grid__profile__name font-semibold flex text-lg pl-4">
-            {{ profile.name }}
+        <div class="flex flex-col justify-between">
+          <div class="pl-1">
+            <div class="ProfileAll__grid__profile__name font-semibold flex text-lg">
+              {{ profile.name | truncate(12) }}
+            </div>
+
+            <span class="font-bold my-2 text-lg">
+              {{ profileBalance(profile) }}
+            </span>
+
+            <RouterLink
+              :to="{ name: 'profile-edition', params: { profileId: profile.id } }"
+              class="ProfileAll__grid__profile__edition-link font-semibold flex text-xs mt-2 mb-1"
+            >
+              {{ $t('PAGES.PROFILE_ALL.EDIT_PROFILE') }}
+            </RouterLink>
+
+            <button
+              class="ProfileAll__grid__profile__delete font-semibold flex text-xs cursor-pointer text-theme-page-text-light hover:underline hover:text-red"
+              @click="openRemovalConfirmation(profile)"
+            >
+              {{ $t('PAGES.PROFILE_ALL.REMOVE_PROFILE') }}
+            </button>
           </div>
-
-          <span class="font-bold my-2 text-lg pl-4">
-            {{ profileBalance(profile) }}
-          </span>
-
-          <RouterLink
-            :to="{ name: 'profile-edition', params: { profileId: profile.id } }"
-            class="ProfileAll__grid__profile__edition-link font-semibold flex text-xs pl-4 mt-2 mb-1"
-          >
-            {{ $t('PAGES.PROFILE_ALL.EDIT_PROFILE') }}
-          </RouterLink>
-
-          <button
-            class="ProfileAll__grid__profile__delete font-semibold flex text-xs cursor-pointer pl-4 text-theme-page-text-light hover:underline hover:text-red"
-            @click="openRemovalConfirmation(profile)"
-          >
-            {{ $t('PAGES.PROFILE_ALL.REMOVE_PROFILE') }}
-          </button>
 
           <a
             v-show="profile.id !== session_profile.id"
-            class="ProfileAll__grid__profile__select font-semibold flex text-xs cursor-pointer pl-4 hover:underline mt-4"
+            class="ProfileAll__grid__profile__select font-semibold flex text-xs cursor-pointer pl-1 hover:underline mt-4"
             @click="selectProfile(profile.id)"
           >
             {{ $t('PAGES.PROFILE_ALL.SELECT_PROFILE') }}
@@ -76,14 +77,14 @@
 </template>
 
 <script>
-import { mapValues, uniqBy } from 'lodash'
-import { mapGetters } from 'vuex'
-import { ProfileRemovalConfirmation } from '@/components/Profile'
+import { map, mapValues, sortBy, uniqBy } from 'lodash'
+import { ProfileAvatar, ProfileRemovalConfirmation } from '@/components/Profile'
 
 export default {
   name: 'ProfileAll',
 
   components: {
+    ProfileAvatar,
     ProfileRemovalConfirmation
   },
 
@@ -92,7 +93,10 @@ export default {
   }),
 
   computed: {
-    ...mapGetters({ profiles: 'profile/all' }),
+    profiles () {
+      return sortBy(this.$store.getters['profile/all'], ['name', 'networkId'])
+    },
+
     addProfileImagePath () {
       return 'pages/new-profile-avatar.svg'
     },
@@ -133,10 +137,14 @@ export default {
       for (const networkId in this.aggregatedBalances) {
         const network = this.$store.getters['network/byId'](networkId)
         const amount = this.currency_subToUnit(this.aggregatedBalances[networkId], network)
-        const balance = this.currency_format(amount, { currency: network.symbol, maximumFractionDigits: network.fractionDigits })
-        balances.push(balance)
+        const formatted = this.currency_format(amount, { currency: network.symbol, maximumFractionDigits: network.fractionDigits })
+        balances.push({
+          formatted,
+          amount: Number(amount)
+        })
       }
-      return balances
+      const sorted = sortBy(balances, ['amount', 'formatted'])
+      return map(sorted, 'formatted').reverse()
     }
   },
 
@@ -154,13 +162,6 @@ export default {
 
     onRemoval () {
       this.hideRemovalConfirmation()
-
-      if (this.profiles.length) {
-        this.$store.dispatch('session/setProfileId', this.profiles[0].id)
-      } else {
-        this.$store.dispatch('session/reset')
-        this.$router.push({ name: 'profile-new' })
-      }
     },
 
     openRemovalConfirmation (profile) {
@@ -188,16 +189,32 @@ export default {
   grid-gap: 1rem;
 }
 .ProfileAll__grid__profile {
-  @apply .p-4 .border-transparent .border-2 .rounded-lg;
+  @apply .p-3 .border-transparent .border-2 .rounded-lg;
 }
-.ProfileAll__grid__profile:hover .profile-avatar-xl {
+.ProfileAll__grid__profile:hover .profile-avatar-xl,
+.ProfileAll__grid__profile:hover .ProfileAvatar__image,
+.ProfileAll__grid__profile:hover .ProfileAvatar__letter {
   transition: 0.5s;
   opacity: 0.5;
 }
 .ProfileAll__grid__profile--selected {
-  @apply .border-green .border-2 .rounded-lg;
+  @apply .border-green;
 }
 .ProfileAll__grid__profile__name {
   width: var(--profile-avatar-xl);
 }
-</style>
+
+.ProfileAll .ProfileAvatar {
+  @apply .flex
+}
+.ProfileAll .ProfileAvatar,
+.ProfileAll .ProfileAvatar__image {
+  height: calc(var(--profile-avatar-xl) * 0.66);
+  width: calc(var(--profile-avatar-xl) * 0.66);
+}
+.ProfileAll .ProfileAvatar__image {
+  @apply .flex .self-center .cursor-pointer;
+}
+.ProfileAll .ProfileAvatar__letter {
+  @apply .mx-auto .self-center .cursor-pointer
+} </style>

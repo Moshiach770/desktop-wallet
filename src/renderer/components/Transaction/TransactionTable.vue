@@ -4,6 +4,7 @@
       v-bind="$attrs"
       :columns="columns"
       :row-style-class="formatRow"
+      :no-data-message="$t('TABLE.NO_TRANSACTIONS')"
       v-on="$listeners"
       @on-row-click="onRowClick"
       @on-sort-change="onSortChange"
@@ -13,16 +14,32 @@
       >
         <div v-if="data.column.field === 'id' && data.row.confirmations > 0">
           <a
-            v-tooltip="{
-              content: data.row.id,
-              classes: 'text-xs',
-              trigger: 'hover'
-            }"
             class="flex items-center whitespace-no-wrap"
             href="#"
             @click.stop="network_openExplorer('transaction', data.row.id)"
           >
-            <span class="mr-1">
+            <SvgIcon
+              v-show="isDashboard"
+              v-tooltip="{
+                content: data.row.vendorField,
+                classes: 'text-xs',
+                trigger: 'hover',
+                container: '.TransactionTable'
+              }"
+              :name="data.formattedRow['vendorField'] ? 'vendorfield' : 'vendorfield-empty'"
+              view-box="0 0 18 18"
+              class="mr-2"
+            />
+
+            <span
+              v-tooltip="{
+                content: data.row.id,
+                classes: 'text-xs',
+                trigger: 'hover',
+                container: '.TransactionTable'
+              }"
+              class="mr-1"
+            >
               {{ data.formattedRow['id'] }}
             </span>
 
@@ -44,6 +61,7 @@
               html: true,
               classes: 'leading-loose',
               trigger: 'hover',
+              container: '.TransactionTable',
               placement: 'left'
             }"
             class="font-bold mr-2 whitespace-no-wrap"
@@ -54,9 +72,10 @@
           <span
             v-if="!isWellConfirmed(data.row.confirmations)"
             v-tooltip="{
-              content: $t('TRANSACTION.CONFIRMATION_COUNT', [data.row.confirmations]),
+              content: $t('TRANSACTION.CONFIRMATION_COUNT', { confirmations: data.row.confirmations }),
               classes: 'text-xs',
-              trigger: 'hover'
+              trigger: 'hover',
+              container: '.TransactionTable'
             }"
             :class="{
               'text-theme-transaction-confirmations-sent bg-theme-transaction-sent': data.row.isSender,
@@ -74,7 +93,8 @@
             v-tooltip="{
               content: $t('TRANSACTION.WELL_CONFIRMED_COUNT', { confirmations: data.row.confirmations }),
               classes: 'text-xs',
-              trigger: 'hover'
+              trigger: 'hover',
+              container: '.TransactionTable'
             }"
             :class="{
               'text-theme-transaction-sent-arrow bg-theme-transaction-sent': data.row.isSender,
@@ -92,19 +112,25 @@
 
         <div
           v-else-if="data.column.field === 'sender'"
-          class="overflow-hidden truncate max-w-xxs"
+          :class="[ isDashboard ? 'dashboard-address' : 'max-w-xxs' ]"
         >
-          <WalletAddress :address="data.row.sender" />
+          <WalletAddress
+            :address="data.row.sender"
+            :address-length="8"
+            tooltip-container=".TransactionTable"
+          />
         </div>
 
         <div
           v-else-if="data.column.field === 'recipient'"
-          class="overflow-hidden truncate max-w-xxs"
+          :class="[ isDashboard ? 'dashboard-address' : 'max-w-xxs' ]"
         >
           <WalletAddress
             :address="data.row.recipient"
+            :address-length="8"
             :type="data.row.type"
             :asset="data.row.asset"
+            tooltip-container=".TransactionTable"
           />
         </div>
 
@@ -149,6 +175,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    isDashboard: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -158,6 +189,15 @@ export default {
 
   computed: {
     columns () {
+      const vendorFieldClass = [
+        'hidden', 'w-1/4'
+      ]
+      if (this.hasShortId && !this.isDashboard) {
+        vendorFieldClass.push('xxl:table-cell')
+      } else if (!this.isDashboard) {
+        vendorFieldClass.push('xl:table-cell')
+      }
+
       return [
         {
           label: this.$t('TRANSACTION.ID'),
@@ -184,8 +224,8 @@ export default {
           label: this.$t('TRANSACTION.VENDOR_FIELD'),
           field: 'vendorField',
           formatFn: this.formatSmartbridge,
-          tdClass: this.hasShortId ? 'hidden xxl:table-cell' : 'hidden xl:table-cell',
-          thClass: this.hasShortId ? 'hidden xxl:table-cell' : 'hidden xl:table-cell'
+          tdClass: vendorFieldClass.join(' '),
+          thClass: vendorFieldClass.join(' ')
         },
         {
           label: this.$t('TRANSACTION.AMOUNT'),
@@ -204,7 +244,7 @@ export default {
 
   methods: {
     formatDate (value) {
-      return this.$d(value, 'long')
+      return this.formatter_date(value)
     },
 
     formatAddress (value) {
@@ -273,5 +313,8 @@ export default {
 }
 .TransactionTable tr.expired {
   @apply line-through;
+}
+.TransactionTable td .dashboard-address {
+  width: 100px;
 }
 </style>

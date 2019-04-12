@@ -4,7 +4,7 @@
     :class="[
       withoutBackground ? 'hover:bg-transparent' : `py-2 px-4 rounded ${colorClass ? colorClass : 'bg-theme-button-light text-theme-button-light-text'}`
     ]"
-    class="ButtonReload cursor-pointer flex items-center self-stretch"
+    class="ButtonReload cursor-pointer inline-flex items-center self-stretch"
     :disabled="isRefreshing"
     @click="emitClick"
   >
@@ -15,7 +15,7 @@
       ]"
       class="mx-1"
       name="update"
-      view-box="0 0 16 14"
+      :view-box="viewBox"
     />
   </button>
 </template>
@@ -55,6 +55,11 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    viewBox: {
+      type: String,
+      required: false,
+      default: '0 0 16 14'
     }
   },
 

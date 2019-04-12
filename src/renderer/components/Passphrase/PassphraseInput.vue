@@ -27,7 +27,7 @@
 
       <button
         :title="$t(passphraseIsVisible ? 'PASSPHRASE_INPUT.HIDE' : 'PASSPHRASE_INPUT.SHOW')"
-        class="PassphraseInput__visibility-button flex flex-no-shrink text-grey-dark hover:text-blue mr-2"
+        class="PassphraseInput__visibility-button flex flex-no-shrink text-grey-dark hover:text-blue focus:text-blue mr-2"
         type="button"
         @click="toggleVisible"
       >
@@ -40,7 +40,7 @@
       <ButtonModal
         ref="button-qr"
         :label="''"
-        class="PassphraseInput__qr-button flex flex-no-shrink text-grey-dark hover:text-blue"
+        class="PassphraseInput__qr-button flex flex-no-shrink text-grey-dark hover:text-blue focus:text-blue"
         icon="qr"
         view-box="0 0 20 20"
       >
@@ -117,6 +117,11 @@ export default {
       type: Number,
       required: true
     },
+    publicKey: {
+      type: String,
+      required: false,
+      default: null
+    },
     value: {
       type: String,
       required: false,
@@ -138,6 +143,8 @@ export default {
         } else if (!this.$v.model.isValid) {
           return this.$t('VALIDATION.NOT_VALID', [this.label])
         } else if (!this.$v.model.matchAddress) {
+          return this.$t('VALIDATION.NOT_MATCH', [this.label, 'address'])
+        } else if (!this.$v.model.matchPublicKey) {
           return this.$t('VALIDATION.NOT_MATCH', [this.label, 'address'])
         }
       }
@@ -208,6 +215,7 @@ export default {
 
     toggleVisible () {
       this.passphraseIsVisible = !this.passphraseIsVisible
+      this.$refs.input.focus()
     }
   },
 
@@ -222,6 +230,13 @@ export default {
           return WalletService.verifyPassphrase(this.address, value, this.pubKeyHash)
         }
         return true
+      },
+      matchPublicKey (value) {
+        if (this.publicKey) {
+          const generatedPublicKey = WalletService.getPublicKeyFromPassphrase(value)
+          return generatedPublicKey === this.publicKey
+        }
+        return true
       }
     }
   }
@@ -232,11 +247,12 @@ export default {
 .PassphraseInput__input::placeholder {
   @apply .text-transparent
 }
-
-.InputField--invalid .PassphraseInput__qr-button {
-  @apply .text-red-dark
-}
+.InputField--invalid .PassphraseInput__qr-button,
 .InputField--invalid .PassphraseInput__visibility-button {
   @apply .text-red-dark
+}
+.InputField--warning .PassphraseInput__qr-button,
+.InputField--warning .PassphraseInput__visibility-button {
+  @apply .text-orange-dark
 }
 </style>

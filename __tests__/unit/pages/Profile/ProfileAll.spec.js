@@ -24,6 +24,9 @@ describe('pages > ProfileAll', () => {
       router,
       i18n,
       mixins: [CurrencyMixin],
+      stubs: {
+        'ProfileAvatar': true
+      },
       mocks: {
         $store: {
           getters: {
@@ -142,12 +145,12 @@ describe('pages > ProfileAll', () => {
   })
 
   describe('totalBalances', () => {
-    it('should return the sum of balances per network, using their symbols', () => {
+    it('should return the sum of balances per network, using their symbols, sorted by quantity descently', () => {
       wrapper = mountPage()
       expect(wrapper.vm.totalBalances).toEqual([
-        'm500.150909',
-        'o0.1219',
-        'd0.5201'
+        'm 500.150909',
+        'd 0.5201',
+        'o 0.1219'
       ])
     })
 
@@ -159,12 +162,12 @@ describe('pages > ProfileAll', () => {
         ]
       })
 
-      it('should include their balances', () => {
+      it('should include their balances, sorted by quantity descently', () => {
         wrapper = mountPage()
         expect(wrapper.vm.totalBalances).toEqual([
-          'm666.22093608',
-          'o0.1219',
-          'd0.5201'
+          'm 666.22093608',
+          'd 0.5201',
+          'o 0.1219'
         ])
       })
     })
@@ -173,7 +176,7 @@ describe('pages > ProfileAll', () => {
   describe('profileBalance', () => {
     it('should return the formatted balance of a profile, using the network symbol', () => {
       wrapper = mountPage()
-      expect(wrapper.vm.profileBalance(profiles[0])).toEqual('m0.137')
+      expect(wrapper.vm.profileBalance(profiles[0])).toEqual('m 0.137')
     })
   })
 })

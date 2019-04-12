@@ -114,6 +114,13 @@
                 class="mt-5"
                 name="explorer"
               />
+
+              <InputText
+                v-model="$v.form.ticker.$model"
+                :label="$t('MODAL_NETWORK.MARKET_TICKER')"
+                class="mt-5"
+                name="ticker"
+              />
             </template>
           </div>
           <div v-else>
@@ -146,13 +153,6 @@
               class="mt-5"
               name="activeDelegates"
             />
-
-            <InputText
-              v-model="$v.form.ticker.$model"
-              :label="$t('MODAL_NETWORK.MARKET_TICKER')"
-              class="mt-5"
-              name="ticker"
-            />
           </div>
         </div>
       </div>
@@ -178,7 +178,7 @@
 
       <button
         v-if="network && !network.isDefault"
-        :disabled="$v.form.$invalid || isNetworkInUse"
+        :disabled="isNetworkInUse"
         class="blue-button mt-5 ml-4"
         type="button"
         @click="removeNetwork"
@@ -208,10 +208,13 @@
 </template>
 
 <script>
-import { numeric, required } from 'vuelidate/lib/validators'
+import { numeric, required, requiredIf } from 'vuelidate/lib/validators'
 import { InputText, InputToggle } from '@/components/Input'
 import { ModalLoader, ModalWindow } from '@/components/Modal'
 import ClientService from '@/services/client'
+import cryptoCompare from '@/services/crypto-compare'
+
+const requiredIfFull = requiredIf(function () { return this.showFull })
 
 export default {
   name: 'NetworkModal',
@@ -255,6 +258,7 @@ export default {
       'Basic',
       'Advanced'
     ],
+    originalName: null,
     configChoice: 'Basic',
     apiVersion: 2,
     hasFetched: false,
@@ -274,7 +278,16 @@ export default {
     },
 
     nameError () {
-      return this.requiredFieldError(this.$v.form.name, this.$refs['input-name'])
+      const isRequired = this.requiredFieldError(this.$v.form.name, this.$refs['input-name'])
+      if (isRequired) {
+        return isRequired
+      }
+      if (this.$v.form.name.$dirty) {
+        if (!this.$v.form.name.doesNotExist) {
+          return this.$t('VALIDATION.NAME.DUPLICATED', [this.form.name])
+        }
+      }
+      return null
     },
 
     descriptionError () {
@@ -326,6 +339,7 @@ export default {
     // Set network values if one is passed along
     if (this.network) {
       this.form.name = this.network.title
+      this.originalName = this.network.title // To ensure that we allow the "duplicate" name as it's the same network
       this.form.description = this.network.description
       this.form.server = this.network.server
 
@@ -349,7 +363,7 @@ export default {
 
   methods: {
     requiredFieldError (fieldValidator, inputRef) {
-      if (fieldValidator.$dirty) {
+      if (fieldValidator.$dirty && inputRef && inputRef.model.length === 0) {
         if (!fieldValidator.required) {
           return this.$t('VALIDATION.REQUIRED', [inputRef.label])
         }
@@ -479,40 +493,40 @@ export default {
         // TODO: currently it's just default values
         wif: '170',
         slip44: '1',
-        activeDelegates: '51',
-        ticker: ''
+        activeDelegates: '51'
       }
-      try {
-        // v2 network
-        const networkConfig = await ClientService.fetchNetworkConfig(this.form.server, 2)
-        if (networkConfig) {
+
+      const fetchAndFill = async (version, callback = null) => {
+        const network = await ClientService.fetchNetworkConfig(this.form.server, version)
+
+        if (network) {
+          const tokenFound = await cryptoCompare.checkTradeable(network.token)
+
           this.form = {
-            ...networkConfig,
+            ...network,
             ...prefilled,
-            version: networkConfig.version.toString(),
-            epoch: networkConfig.constants.epoch
+            ticker: tokenFound ? network.token : '',
+            version: network.version.toString()
           }
 
-          this.apiVersion = 2
+          this.apiVersion = version
           this.showFull = true
           this.hasFetched = true
+
+          if (callback) {
+            callback(network)
+          }
         }
+      }
+
+      // Try V2 first and fallback to V1
+      try {
+        await fetchAndFill(2, network => {
+          this.form.epoch = network.constants.epoch
+        })
       } catch (v2Error) {
         try {
-          // v1 network fallback
-          const networkConfig = await ClientService.fetchNetworkConfig(this.form.server, 1)
-          // Populate form with response data
-          if (networkConfig) {
-            this.form = {
-              ...networkConfig,
-              ...prefilled,
-              version: networkConfig.version.toString()
-            }
-
-            this.apiVersion = 1
-            this.showFull = true
-            this.hasFetched = true
-          }
+          await fetchAndFill(1)
         } catch (v1Error) {
           this.$error(this.$t('MODAL_NETWORK.FAILED_FETCH'))
         }
@@ -543,7 +557,10 @@ export default {
   validations: {
     form: {
       name: {
-        required
+        required,
+        doesNotExist (value) {
+          return (this.originalName && value === this.originalName) || !this.$store.getters['network/byName'](value)
+        }
       },
       description: {
         required
@@ -558,45 +575,45 @@ export default {
         }
       },
       nethash: {
-        required,
+        requiredIfFull,
         isValid (value) {
-          return /^[a-z0-9]{64}$/.test(value)
+          return !this.showFull || /^[a-z0-9]{64}$/.test(value)
         }
       },
       token: {
-        required
+        requiredIfFull
       },
       symbol: {
-        required
+        requiredIfFull
       },
       version: {
-        required,
+        requiredIfFull,
         numeric
       },
       explorer: {
-        required,
+        requiredIfFull,
         isValid (value) {
-          return /(:\/\/){1}[^\-.]+[a-zA-Z0-9\-_.]*[^\-.]+$/.test(value)
+          return !this.showFull || /(:\/\/){1}[^\-.]+[a-zA-Z0-9\-_.]*[^\-.]+$/.test(value)
         },
         hasScheme (value) {
-          return /^https?:\/\//.test(value)
+          return !this.showFull || /^https?:\/\//.test(value)
         }
       },
       epoch: {
-        required,
+        requiredIfFull,
         isValid (value) {
-          return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.000Z$/.test(value)
+          return !this.showFull || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)
         }
       },
       wif: {
-        required,
+        requiredIfFull,
         numeric
       },
       slip44: {
-        required
+        requiredIfFull
       },
       activeDelegates: {
-        required,
+        requiredIfFull,
         numeric
       },
       ticker: {

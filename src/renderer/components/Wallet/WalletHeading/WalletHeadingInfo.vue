@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center">
-    <div class="absolute pin-t pin-l h-40 w-48">
+    <div class="absolute pin-t pin-l h-40 w-40">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         :width="160"
@@ -25,10 +25,10 @@
       :size="75"
       class="WalletHeading__identicon"
     />
-    <div class="flex flex-col justify-center text-white antialiased pl-4">
+    <div class="flex flex-col justify-center text-white antialiased pl-4 z-10">
       <div
         v-if="name"
-        class="flex flex-row text-lg font-semibold text-theme-feature-item-text"
+        class="flex flex-row text-lg font-semibold text-theme-heading-text"
       >
         <span class="block xl:hidden">
           {{ name | truncate(12) }}
@@ -36,6 +36,13 @@
         <span class="hidden xl:block">
           {{ name | truncate(30) }}
         </span>
+        <SvgIcon
+          v-if="isKnownWallet()"
+          v-tooltip="{ content: verifiedAddressText, trigger: 'hover' }"
+          name="verified-address"
+          view-box="0 0 18 18"
+          class="ml-2"
+        />
       </div>
 
       <p class="WalletHeading__address tracking-wide mb-3 flex items-center text-sm font-semibold">
@@ -53,7 +60,7 @@
         </span>
 
         <SvgIcon
-          v-if="currentWallet.secondPublicKey"
+          v-if="secondPublicKey"
           v-tooltip="$t('WALLET_HEADING.SECOND_PASSPHRASE_ENABLED')"
           name="2nd-passphrase"
           view-box="0 0 18 18"
@@ -67,7 +74,7 @@
         />
 
         <button
-          v-if="currentWallet.publicKey"
+          v-if="publicKey"
           v-tooltip="{
             content: labelTooltip,
             trigger:'hover'
@@ -77,7 +84,7 @@
         >
           <SvgIcon
             :name="showPublicKey ? 'world' : 'key'"
-            view-box="0 0 18 18"
+            view-box="0 0 16 16"
           />
         </button>
       </p>
@@ -86,7 +93,7 @@
         {{ balance }}
         <span
           v-if="isMarketEnabled"
-          class="WalletHeading__balance__alternative text-xs text-theme-feature-item-text"
+          class="WalletHeading__balance__alternative text-xs text-theme-heading-text"
         >
           {{ alternativeBalance }}
         </span>
@@ -110,7 +117,8 @@ export default {
   },
 
   data: () => ({
-    showPublicKey: false
+    showPublicKey: false,
+    lazyWallet: {}
   }),
 
   computed: {
@@ -118,18 +126,31 @@ export default {
       return this.currentWallet ? this.currentWallet.address : ''
     },
     publicKey () {
-      return this.currentWallet ? this.currentWallet.publicKey : ''
+      const publicKey = this.currentWallet ? this.currentWallet.publicKey : ''
+      const lazyPublicKey = this.lazyWallet.publicKey
+
+      return publicKey || lazyPublicKey
+    },
+    secondPublicKey () {
+      const secondPublicKey = this.currentWallet ? this.currentWallet.secondPublicKey : ''
+      const lazySecondPublicKey = this.lazyWallet.secondPublicKey
+
+      return secondPublicKey || lazySecondPublicKey
     },
     alternativeBalance () {
-      const balance = this.currentWallet ? this.currency_subToUnit(this.currentWallet.balance) : 0
-      return this.currency_format(balance * this.price, { currency: this.alternativeCurrency })
+      const unitBalance = this.currency_subToUnit(this.rawBalance)
+      return this.currency_format(unitBalance * this.price, { currency: this.alternativeCurrency })
     },
     alternativeCurrency () {
       return this.$store.getters['session/currency']
     },
     balance () {
-      const balance = this.currentWallet ? this.currentWallet.balance : 0
-      return this.formatter_networkCurrency(balance)
+      return this.formatter_networkCurrency(this.rawBalance)
+    },
+    rawBalance () {
+      return this.currentWallet.profileId.length
+        ? this.currentWallet.balance
+        : (this.lazyWallet.balance || 0)
     },
     name () {
       return this.wallet_name(this.currentWallet.address)
@@ -148,12 +169,41 @@ export default {
     },
     labelTooltip () {
       return this.showPublicKey ? this.$t('WALLET_HEADING.ACTIONS.SHOW_ADDRESS') : this.$t('WALLET_HEADING.ACTIONS.SHOW_PUBLIC_KEY')
+    },
+    verifiedAddressText () {
+      let verifiedText = ''
+      let knownWallet = this.isKnownWallet()
+      if (knownWallet && knownWallet !== this.name) {
+        verifiedText = `${knownWallet} - `
+      }
+
+      return verifiedText + this.$t('COMMON.VERIFIED_ADDRESS')
+    }
+  },
+
+  watch: {
+    publicKey () {
+      if (!this.publicKey) this.showPublicKey = false
     }
   },
 
   methods: {
     togglePublicKey () {
       this.showPublicKey = !this.showPublicKey
+    },
+
+    isKnownWallet () {
+      return this.session_network.knownWallets[this.address]
+    },
+
+    // Called by the parent when the address changed
+    // Fetch watch-only address, since the wallet is not stored on vuex
+    async refreshWallet () {
+      if (this.currentWallet.profileId.length) {
+        return
+      }
+
+      this.lazyWallet = await this.$client.fetchWallet(this.currentWallet.address)
     }
   }
 }

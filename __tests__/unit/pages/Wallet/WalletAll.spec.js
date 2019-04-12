@@ -31,17 +31,25 @@ describe('pages > WalletAll', () => {
             'ledger/isConnected': false,
             'ledger/wallets': ledgerWallets,
             'profile/balanceWithLedger': jest.fn(),
+            'session/hasWalletGridLayout': true,
             'wallet/byProfileId': id => wallets
           }
         },
         session_network: {
-          symbol: 'Ѧ',
+          symbol: 'ⓟ',
           market: {
             enabled: true
           }
         },
+        session_profile: {
+          name: 'jest'
+        },
+        wallet_sortByName: () => wallets,
         formatter_networkCurrency: jest.fn(),
         wallet_name: value => value
+      },
+      stubs: {
+        'ButtonLetter': true
       }
     })
   }

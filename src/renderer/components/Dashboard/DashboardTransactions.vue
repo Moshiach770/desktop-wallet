@@ -2,11 +2,14 @@
   <TransactionTable
     :has-short-id="true"
     :rows="lastTransactions"
+    :is-dashboard="true"
+    :is-loading="isLoading"
+    :no-data-message="$t('TABLE.NO_TRANSACTIONS')"
   />
 </template>
 
 <script>
-import { uniqBy } from 'lodash'
+import { uniqBy, orderBy, flatten } from 'lodash'
 import mergeTableTransactions from '@/components/utils/merge-table-transactions'
 import { TransactionTable } from '@/components/Transaction'
 
@@ -21,12 +24,14 @@ export default {
     numberOfTransactions: {
       type: Number,
       required: false,
-      default: 10
+      default: 50
     }
   },
 
   data: () => ({
-    fetchedTransactions: []
+    fetchedTransactions: [],
+    previousWalletAddresses: [],
+    isLoading: false
   }),
 
   computed: {
@@ -34,7 +39,7 @@ export default {
       return mergeTableTransactions(this.fetchedTransactions, this.storedTransactions)
     },
     storedTransactions () {
-      return this.$store.getters['transaction/byProfileId'](this.session_profile.id, true)
+      return this.$store.getters['transaction/byProfileId'](this.session_profile.id, { includeExpired: true })
     },
     wallets () {
       return [
@@ -44,45 +49,22 @@ export default {
     }
   },
 
-  watch: {
-    // This watcher would invoke the `fetch` after the `Synchronizer`
-    wallets () {
-      this.fetchTransactions()
-    }
-  },
-
   created () {
-    this.fetchTransactions()
+    if (this.wallets.length) {
+      this.isLoading = true
+    }
+
+    this.$eventBus.on('transactions:fetched', transactionsByWallet => {
+      const transactions = flatten(Object.values(transactionsByWallet))
+      this.fetchedTransactions = this.processTransactions(transactions)
+      this.isLoading = false
+    })
   },
 
   methods: {
-    async fetchTransactions () {
-      if (!this.wallets.length) return
-
-      try {
-        // TODO if wallets.length > 20 do it in batches
-        this.wallets.map(async wallet => {
-          const { transactions } = await this.$client.fetchWalletTransactions(wallet.address, {
-            limit: this.numberOfTransactions
-          })
-
-          // Update the transactions of each wallet when they are received
-          this.$set(this, 'fetchedTransactions', uniqBy([
-            /*
-             * NOTE: The order of this 2 lines is VERY important:
-             * recent transactions should override older to have the up-to-date number of confirmations
-             */
-            ...transactions,
-            ...this.fetchedTransactions
-          ], 'id'))
-        })
-      } catch (error) {
-        this.$logger.error(error)
-        this.$error(this.$t('COMMON.FAILED_FETCH', {
-          name: 'transactions',
-          msg: error.message
-        }))
-      }
+    processTransactions (transactions) {
+      const ordered = orderBy(uniqBy(transactions, 'id'), 'timestamp', 'desc')
+      return ordered.slice(0, this.numberOfTransactions)
     }
   }
 }

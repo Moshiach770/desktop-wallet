@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="WalletTransactions">
     <div
       v-if="newTransactionsNotice"
       class="bg-theme-feature flex flex-row"
@@ -18,6 +18,7 @@
       :is-remote="true"
       :has-pagination="totalCount > 0"
       :sort-query="queryParams.sort"
+      :per-page="transactionTableRowCount"
       @on-per-page-change="onPerPageChange"
       @on-page-change="onPageChange"
       @on-sort-change="onSortChange"
@@ -26,7 +27,7 @@
 </template>
 
 <script>
-import { at } from 'lodash'
+import { at, clone } from 'lodash'
 import mergeTableTransactions from '@/components/utils/merge-table-transactions'
 import TransactionTable from '@/components/Transaction/TransactionTable'
 
@@ -55,6 +56,20 @@ export default {
       }
     }
   }),
+
+  computed: {
+    transactionTableRowCount: {
+      get () {
+        return this.$store.getters['session/transactionTableRowCount']
+      },
+      set (count) {
+        this.$store.dispatch('session/setTransactionTableRowCount', count)
+        const profile = clone(this.session_profile)
+        profile.transactionTableRowCount = count
+        this.$store.dispatch('profile/update', profile)
+      }
+    }
+  },
 
   watch: {
     // This watcher would invoke the `fetch` after the `Synchronizer`
@@ -115,7 +130,7 @@ export default {
         return []
       }
 
-      return this.$store.getters['transaction/byAddress'](address, true)
+      return this.$store.getters['transaction/byAddress'](address, { includeExpired: true })
     },
 
     async getTransactions (address) {
@@ -251,13 +266,17 @@ export default {
     onPerPageChange ({ currentPerPage }) {
       this.__updateParams({ limit: currentPerPage, page: 1 })
       this.loadTransactions()
+      this.transactionTableRowCount = currentPerPage
     },
 
     onSortChange (sortOptions) {
+      const columnName = sortOptions[0].field
+      const sortType = sortOptions[0].type
+
       this.__updateParams({
         sort: {
-          type: sortOptions[0].type,
-          field: sortOptions[0].field
+          field: columnName,
+          type: sortType
         },
         page: 1
       })

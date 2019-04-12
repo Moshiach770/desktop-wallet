@@ -25,6 +25,8 @@
         :minimum-amount="feeChoiceMin"
         :minimum-error="minimumError"
         :warning-text="warningText"
+        :is-disabled="isDisabled"
+        :wallet-network="walletNetwork"
         class="w-full InputField--dirty"
         @raw="onRawInput"
       />
@@ -35,6 +37,7 @@
       :max="feeChoiceMax"
       :min="feeChoiceMin"
       :step="step"
+      :disabled="isDisabled"
       type="range"
       class="w-full m-0 py-2 z-10"
       name="fee"
@@ -44,7 +47,8 @@
       <button
         v-for="choice in Object.keys(feeChoices)"
         :key="choice"
-        :class="{ 'InputFee__choice--active': choice === feeChoice }"
+        :class="{ 'InputFee__choice--active': choice === chosenFee }"
+        :disabled="isDisabled"
         class="InputFee__choice cursor-pointer font-semibold text-xs"
         @click="onChoice(choice)"
       >
@@ -91,31 +95,37 @@ export default {
     showInsufficientFunds: {
       type: Boolean,
       required: false,
+      default: true
+    },
+
+    isDisabled: {
+      type: Boolean,
+      required: false,
       default: false
+    },
+
+    wallet: {
+      type: Object,
+      required: false,
+      default: null
+    },
+
+    walletNetwork: {
+      type: Object,
+      required: false,
+      default: null
     }
   },
 
-  data () {
-    const maxV1fee = V1.fees[this.transactionType] * 1e-8
-    const data = {
-      feeChoices: {
-        MINIMUM: 1,
-        AVERAGE: maxV1fee / 2,
-        MAXIMUM: maxV1fee,
-        INPUT: maxV1fee / 2,
-        ADVANCED: maxV1fee / 2
-      },
-      feeChoice: 'AVERAGE',
-      maxV1fee,
-      step: 1e-8
-    }
-    data.fee = data.feeChoices[data.feeChoice]
-    return data
-  },
+  data: () => ({
+    chosenFee: 'AVERAGE',
+    step: 1e-8,
+    fee: 0
+  }),
 
   computed: {
     currentWallet () {
-      return this.wallet_fromRoute
+      return this.wallet || this.wallet_fromRoute
     },
     hiddenGradientStyle () {
       return {
@@ -134,44 +144,86 @@ export default {
     notValidError () {
       return this.$t('INPUT_FEE.ERROR.NOT_VALID')
     },
-    feeChoiceMin () {
-      if (this.isAdvancedFee) {
-        return 1 / 1e8
+    maxV1fee () {
+      const defaultMaxV1Fee = V1.fees[this.transactionType]
+      return (this.$store.getters['transaction/staticFee'](this.transactionType) || defaultMaxV1Fee) * 1e-8
+    },
+    isStaticFee () {
+      if (this.feeChoices.MAXIMUM === this.feeChoices.AVERAGE) {
+        return +this.fee === this.feeChoices.AVERAGE
+      }
+      return false
+    },
+    isAdvancedFee () {
+      return this.chosenFee === 'ADVANCED'
+    },
+    feeNetwork () {
+      return this.walletNetwork || this.session_network
+    },
+    feeStatistics () {
+      if (!this.feeNetwork) {
+        throw new Error('No active network to fetch fees')
+      }
+      if (this.feeNetwork.apiVersion === 1) {
+        throw new Error('Fee statistics are supported only by v2 networks')
       }
 
+      const { feeStatistics } = this.feeNetwork
+      const transactionStatistics = feeStatistics.find(feeConfig => feeConfig.type === this.transactionType)
+      if (transactionStatistics) {
+        return transactionStatistics.fees
+      }
+
+      return {
+        avgFee: this.maxV1fee * 1e8,
+        maxFee: this.maxV1fee * 1e8
+      }
+    },
+    feeChoiceMin () {
       return this.feeChoices.MINIMUM
     },
     feeChoiceMax () {
-      if (this.isAdvancedFee) {
-        return this.feeChoices.MAXIMUM * 10
-      }
+      return this.isAdvancedFee ? this.feeChoices.MAXIMUM * 10 : this.feeChoices.MAXIMUM
+    },
+    feeChoices () {
+      let { avgFee, maxFee } = this.feeStatistics
+      avgFee = avgFee * 1e-8
+      maxFee = maxFee * 1e-8
 
-      return this.feeChoices.MAXIMUM
+      // Even if the network provides average or maximum fees higher than V1, they will be corrected
+      const average = avgFee < this.maxV1fee ? avgFee : this.maxV1fee
+      return {
+        MINIMUM: 1e-8,
+        AVERAGE: average,
+        MAXIMUM: maxFee < this.maxV1fee ? maxFee : this.maxV1fee,
+        INPUT: average,
+        ADVANCED: average
+      }
     },
     minimumError () {
-      const min = !this.isAdvancedFee ? this.feeChoices.MINIMUM : 1 / 1e8
+      const min = this.feeChoices.MINIMUM
       const fee = this.currency_format(min, { currency: this.currency, currencyDisplay: 'code' })
       return this.$t('INPUT_FEE.ERROR.LESS_THAN_MINIMUM', { fee })
     },
     maximumError () {
-      if (this.isAdvancedFee) {
-        return ''
+      if (!this.isAdvancedFee) {
+        const max = this.feeChoices.MAXIMUM
+        const fee = this.currency_format(max, { currency: this.currency, currencyDisplay: 'code' })
+        return this.$t('INPUT_FEE.ERROR.MORE_THAN_MAXIMUM', { fee })
       }
-
-      const max = this.feeChoices.MAXIMUM
-      const fee = this.currency_format(max, { currency: this.currency, currencyDisplay: 'code' })
-      return this.$t('INPUT_FEE.ERROR.MORE_THAN_MAXIMUM', { fee })
+      return null
     },
     insufficientFundsError () {
       if (!this.showInsufficientFunds) {
-        return ''
+        return null
       }
 
-      if (parseFloat(this.currency_subToUnit(this.currentWallet.balance)) < parseFloat(this.fee)) {
+      const funds = parseFloat(this.currency_subToUnit(this.currentWallet.balance))
+      if (funds < parseFloat(this.fee)) {
         const balance = this.formatter_networkCurrency(this.currentWallet.balance)
         return this.$t('TRANSACTION_FORM.ERROR.NOT_ENOUGH_BALANCE', { balance })
       }
-      return ''
+      return null
     },
     warningText () {
       if (this.isAdvancedFee) {
@@ -180,50 +232,28 @@ export default {
       if (this.fee < this.feeChoices.AVERAGE) {
         return this.$t('INPUT_FEE.LOW_FEE_NOTICE')
       }
-
       return null
-    },
-    isStaticFee () {
-      if (this.feeChoices.MAXIMUM === this.feeChoices.AVERAGE) {
-        return +this.fee === this.feeChoices.AVERAGE
-      }
-
-      return false
-    },
-    isAdvancedFee () {
-      return this.feeChoice === 'ADVANCED'
     }
   },
 
   created () {
-    this.prepareFeeStatistics()
+    // Fees should be synchronized only when this component is active
+    this.$synchronizer.focus('fees')
+
+    this.emitFee(this.feeChoices.AVERAGE)
+  },
+
+  beforeDestroy () {
+    this.$synchronizer.pause('fees')
   },
 
   methods: {
-    /**
-     * Even if the network provides a fees higher than V1, it will be corrected
-     */
-    prepareFeeStatistics () {
-      let { avgFee, maxFee } = this.$store.getters['network/feeStatisticsByType'](this.transactionType)
-
-      avgFee = avgFee * Math.pow(10, -8)
-      this.$set(this.feeChoices, 'AVERAGE', avgFee < this.maxV1fee ? avgFee : this.maxV1fee)
-
-      maxFee = maxFee * Math.pow(10, -8)
-      this.$set(this.feeChoices, 'MAXIMUM', maxFee < this.maxV1fee ? maxFee : this.maxV1fee)
-
-      this.$set(this.feeChoices, 'MINIMUM', 1 / 1e8)
-
-      this.$set(this.feeChoices, 'INPUT', this.feeChoices.AVERAGE)
-      this.$set(this.feeChoices, 'ADVANCED', this.feeChoices.AVERAGE)
-      this.emitFee(this.feeChoices.AVERAGE)
-    },
     focusInput () {
       this.$refs.input.focus()
     },
     onChoice (choice) {
-      this.feeChoice = choice
-      if (['INPUT', 'ADVANCED'].includes(this.feeChoice)) {
+      this.chosenFee = choice
+      if (['INPUT', 'ADVANCED'].includes(this.chosenFee)) {
         this.focusInput()
       }
 
@@ -235,12 +265,12 @@ export default {
      * @param {String} fee
      */
     onRawInput (fee) {
-      if (!['INPUT', 'ADVANCED'].includes(this.feeChoice)) {
-        this.feeChoice = 'INPUT'
+      if (!['INPUT', 'ADVANCED'].includes(this.chosenFee)) {
+        this.chosenFee = 'INPUT'
       }
 
       fee = fee.toString()
-      this.$set(this.feeChoices, this.feeChoice, fee)
+      this.$set(this.feeChoices, this.chosenFee, fee)
       this.emitFee(fee)
     },
     /**
@@ -248,11 +278,11 @@ export default {
      * @param {String} fee
      */
     onSlider (fee) {
-      if (!['INPUT', 'ADVANCED'].includes(this.feeChoice)) {
-        this.feeChoice = 'INPUT'
+      if (!['INPUT', 'ADVANCED'].includes(this.chosenFee)) {
+        this.chosenFee = 'INPUT'
       }
 
-      this.$set(this.feeChoices, this.feeChoice, fee)
+      this.$set(this.feeChoices, this.chosenFee, fee)
       this.emitFee(fee)
     },
     /**

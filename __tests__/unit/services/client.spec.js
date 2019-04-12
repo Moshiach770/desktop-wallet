@@ -31,6 +31,12 @@ describe('Services > Client', () => {
     client = new ClientService()
   })
 
+  describe('constructor', () => {
+    it('should use version 1 the capabilities of the API', () => {
+      expect(client.__capabilities).toEqual('1.0.0')
+    })
+  })
+
   describe('set version', () => {
     it('should establish the API client version', () => {
       expect(client.version).toEqual(null)
@@ -117,6 +123,142 @@ describe('Services > Client', () => {
         expect(wallet).toHaveProperty('balance', parseInt(data.balance))
         expect(wallet).toHaveProperty('publicKey', data.publicKey)
         expect(wallet).toHaveProperty('isDelegate', true)
+      })
+    })
+  })
+
+  describe('fetchWallets', () => {
+    const wallets = [
+      {
+        address: 'address1',
+        balance: '1202',
+        publicKey: 'public key'
+      },
+      {
+        address: 'address2',
+        balance: '300',
+        publicKey: 'public key'
+      }
+    ]
+    const walletAddresses = ['address1', 'address2']
+    let walletsResponse = {
+      data: {
+        data: [
+          {
+            ...wallets[0],
+            isDelegate: true,
+            username: 'test'
+          },
+          {
+            ...wallets[1],
+            isDelegate: false,
+            username: null
+          }
+        ]
+      }
+    }
+    const generateAccountResponse = (address) => {
+      return {
+        data: {
+          success: true,
+          account: {
+            ...wallets.find(wallet => wallet.address === address),
+            unconfirmedBalance: 'NO',
+            unconfirmedSignature: 'NO',
+            secondSignature: 'NO',
+            multisignatures: 'NO',
+            u_multisignatures: 'NO'
+          }
+        }
+      }
+    }
+    const generateWalletResponse = (address) => {
+      return {
+        data: {
+          data: {
+            ...wallets.find(wallet => wallet.address === address),
+            isDelegate: true,
+            username: 'test'
+          }
+        }
+      }
+    }
+
+    let getAccountEndpoint = jest.fn(generateAccountResponse)
+    let getWalletEndpoint = jest.fn(generateWalletResponse)
+    let searchWalletEndpoint = jest.fn(() => walletsResponse)
+    beforeEach(() => {
+      const resource = resource => {
+        if (resource === 'accounts') {
+          return {
+            get: getAccountEndpoint
+          }
+        } else if (resource === 'wallets') {
+          return {
+            get: getWalletEndpoint,
+            search: searchWalletEndpoint
+          }
+        }
+      }
+
+      client.client.resource = jest.fn(resource)
+    })
+
+    describe('when version capabilities are at least 2.1.0', () => {
+      beforeEach(() => {
+        client.__capabilities = '2.1.0'
+      })
+
+      it('should call the wallet search endpoint', async () => {
+        const fetchedWallets = await client.fetchWallets(walletAddresses)
+
+        expect(client.client.resource).toHaveBeenNthCalledWith(1, 'wallets')
+        expect(searchWalletEndpoint).toHaveBeenNthCalledWith(1, { addresses: walletAddresses })
+        expect(fetchedWallets).toEqual(walletsResponse.data.data)
+      })
+    })
+
+    describe('when version capabilities are not at least 2.1.0', () => {
+      beforeEach(() => {
+        client.__capabilities = '2.0.9'
+      })
+
+      describe('when version is 2', () => {
+        beforeEach(() => {
+          client.version = 2
+        })
+
+        it('should call the wallet endpoint for each wallet', async () => {
+          const fetchedWallets = await client.fetchWallets(walletAddresses)
+
+          expect(client.client.resource).toHaveBeenNthCalledWith(1, 'wallets')
+          expect(client.client.resource).toHaveBeenNthCalledWith(2, 'wallets')
+          expect(getWalletEndpoint).toHaveBeenNthCalledWith(1, walletAddresses[0])
+          expect(getWalletEndpoint).toHaveBeenNthCalledWith(2, walletAddresses[1])
+          expect(fetchedWallets).toEqual([
+            generateWalletResponse('address1').data.data,
+            generateWalletResponse('address2').data.data
+          ].map(wallet => ({ ...wallet, balance: +wallet.balance })))
+        })
+      })
+
+      describe('when version is 1', () => {
+        beforeEach(() => {
+          client.version = 1
+        })
+
+        it('should call the account endpoint for each wallet', async () => {
+          const fetchedWallets = await client.fetchWallets(walletAddresses)
+
+          expect(client.client.resource).toHaveBeenNthCalledWith(1, 'accounts')
+          expect(client.client.resource).toHaveBeenNthCalledWith(2, 'accounts')
+          expect(getAccountEndpoint).toHaveBeenNthCalledWith(1, walletAddresses[0])
+          expect(getAccountEndpoint).toHaveBeenNthCalledWith(2, walletAddresses[1])
+          expect(fetchedWallets).toEqual([
+            { ...wallets[0], balance: +wallets[0].balance, isDelegate: false },
+            { ...wallets[1], balance: +wallets[1].balance, isDelegate: false }
+          ])
+        })
       })
     })
   })
@@ -247,6 +389,68 @@ describe('Services > Client', () => {
     })
   })
 
+  describe('fetchStaticFees', () => {
+    describe('when version is 1', () => {
+      const data = fixtures.staticFeeResponses.v1.fees
+
+      beforeEach(() => {
+        client.version = 1
+
+        const resource = resource => {
+          if (resource === 'blocks') {
+            return {
+              fees: () => ({ data: fixtures.staticFeeResponses.v1 })
+            }
+          }
+        }
+
+        client.client.resource = resource
+      })
+
+      it('should return and match fees to types', async () => {
+        const response = await client.fetchStaticFees()
+
+        expect(response[0]).toEqual(data.send)
+        expect(response[1]).toEqual(data.secondsignature)
+        expect(response[2]).toEqual(data.delegate)
+        expect(response[3]).toEqual(data.vote)
+        expect(response[4]).toEqual(data.multisignature)
+      })
+    })
+
+    describe('when version is 2', () => {
+      const data = fixtures.staticFeeResponses.v2.data
+
+      beforeEach(() => {
+        client.version = 2
+
+        const resource = resource => {
+          if (resource === 'transactions') {
+            return {
+              fees: () => ({ data: fixtures.staticFeeResponses.v2 })
+            }
+          }
+        }
+
+        client.client.resource = resource
+      })
+
+      it('should return and match fees to types', async () => {
+        const response = await client.fetchStaticFees()
+
+        expect(response[0]).toEqual(data.transfer)
+        expect(response[1]).toEqual(data.secondSignature)
+        expect(response[2]).toEqual(data.delegateRegistration)
+        expect(response[3]).toEqual(data.vote)
+        expect(response[4]).toEqual(data.multiSignature)
+        expect(response[5]).toEqual(data.ipfs)
+        expect(response[6]).toEqual(data.timelockTransfer)
+        expect(response[7]).toEqual(data.multiPayment)
+        expect(response[8]).toEqual(data.delegateResignation)
+      })
+    })
+  })
+
   describe('fetchDelegateForged', () => {
     const delegateV1 = {
       publicKey: 'dummyKey'
@@ -328,7 +532,7 @@ describe('Services > Client', () => {
         expect(transaction).not.toHaveProperty('senderId')
         expect(transaction).not.toHaveProperty('recipientId')
         expect(transaction).not.toHaveProperty('isSender')
-        expect(transaction).not.toHaveProperty('isReceiver')
+        expect(transaction).not.toHaveProperty('isRecipient')
       })
     })
   })
@@ -364,7 +568,7 @@ describe('Services > Client', () => {
           expect(transaction).toHaveProperty('totalAmount', data[i].amount + data[i].fee)
           expect(transaction).toHaveProperty('timestamp', new Date(data[i].timestamp.human).getTime())
           expect(transaction).toHaveProperty('isSender')
-          expect(transaction).toHaveProperty('isReceiver')
+          expect(transaction).toHaveProperty('isRecipient')
           expect(transaction).toHaveProperty('sender')
           expect(transaction).toHaveProperty('recipient')
           expect(transaction).not.toHaveProperty('senderId')
@@ -401,11 +605,141 @@ describe('Services > Client', () => {
           expect(transaction).toHaveProperty('totalAmount', data[i].amount + data[i].fee)
           expect(transaction).toHaveProperty('timestamp', data[i].timestamp.unix * 1000)
           expect(transaction).toHaveProperty('isSender')
-          expect(transaction).toHaveProperty('isReceiver')
+          expect(transaction).toHaveProperty('isRecipient')
           expect(transaction).toHaveProperty('sender')
           expect(transaction).toHaveProperty('recipient')
           expect(transaction).not.toHaveProperty('senderId')
           expect(transaction).not.toHaveProperty('recipientId')
+        })
+      })
+    })
+  })
+
+  describe('fetchTransactionsForWallets', () => {
+    const { meta } = fixtures.transactions
+    const walletAddresses = ['address1', 'address2']
+    let transactions
+    let getTransactionsEndpoint
+    let searchTransactionsEndpoint
+    let walletTransactions
+
+    describe('when version capabilities are at least 2.1.0', () => {
+      beforeEach(() => {
+        client.__capabilities = '2.1.0'
+
+        transactions = cloneDeep(fixtures.transactions.v2)
+        searchTransactionsEndpoint = jest.fn(() => ({ data: { data: transactions } }))
+
+        const resource = resource => {
+          if (resource === 'transactions') {
+            return {
+              search: searchTransactionsEndpoint
+            }
+          }
+        }
+
+        client.client.resource = jest.fn(resource)
+      })
+
+      it('should call the transaction search endpoint', async () => {
+        walletTransactions = walletAddresses.reduce((all, address) => {
+          all[address] = transactions.filter(transaction => {
+            return [transaction.sender, transaction.recipient].includes(address)
+          })
+          return all
+        }, {})
+
+        const fetchedWallets = await client.fetchTransactionsForWallets(walletAddresses)
+
+        expect(client.client.resource).toHaveBeenNthCalledWith(1, 'transactions')
+        expect(searchTransactionsEndpoint).toHaveBeenNthCalledWith(1, { addresses: walletAddresses })
+        expect(fetchedWallets).toEqual(walletTransactions)
+      })
+    })
+
+    describe('when version capabilities are not at least 2.1.0', () => {
+      beforeEach(() => {
+        client.__capabilities = '2.0.9'
+      })
+
+      describe('when version in v2', () => {
+        beforeEach(() => {
+          client.version = 2
+
+          transactions = cloneDeep(fixtures.transactions.v2)
+          getTransactionsEndpoint = jest.fn(() => {
+            return {
+              data: {
+                data: transactions,
+                meta: {
+                  totalCount: meta.count
+                }
+              }
+            }
+          })
+
+          walletTransactions = walletAddresses.reduce((all, address) => {
+            all[address] = transactions
+            return all
+          }, {})
+
+          const resource = resource => {
+            if (resource === 'wallets') {
+              return {
+                transactions: getTransactionsEndpoint
+              }
+            }
+          }
+
+          client.client.resource = jest.fn(resource)
+        })
+
+        it('should call the wallet transactions endpoint for each wallet', async () => {
+          const fetchedWallets = await client.fetchTransactionsForWallets(walletAddresses)
+
+          expect(client.client.resource).toHaveBeenNthCalledWith(1, 'wallets')
+          expect(client.client.resource).toHaveBeenNthCalledWith(2, 'wallets')
+          expect(getTransactionsEndpoint).toHaveBeenCalledTimes(2)
+          expect(fetchedWallets).toEqual(walletTransactions)
+        })
+      })
+
+      describe('when version in v1', () => {
+        beforeEach(() => {
+          client.version = 1
+
+          transactions = cloneDeep(fixtures.transactions.v1)
+          getTransactionsEndpoint = jest.fn(() => {
+            return {
+              data: {
+                transactions, success: true, count: meta.count.toString()
+              }
+            }
+          })
+
+          walletTransactions = walletAddresses.reduce((all, address) => {
+            all[address] = transactions
+            return all
+          }, {})
+
+          const resource = resource => {
+            if (resource === 'transactions') {
+              return {
+                all: getTransactionsEndpoint
+              }
+            }
+          }
+
+          client.client.resource = jest.fn(resource)
+        })
+
+        it('should call the v1 transactions endpoint', async () => {
+          const fetchedWallets = await client.fetchTransactionsForWallets(walletAddresses)
+
+          expect(client.client.resource).toHaveBeenNthCalledWith(1, 'transactions')
+          expect(client.client.resource).toHaveBeenNthCalledWith(2, 'transactions')
+          expect(getTransactionsEndpoint).toHaveBeenCalledTimes(2)
+          expect(fetchedWallets).toEqual(walletTransactions)
         })
       })
     })
@@ -421,8 +755,8 @@ describe('Services > Client', () => {
 
     describe('when the fee is smaller or equal to V1 fee (25)', () => {
       it('should not throw an Error', async () => {
-        expect(await errorCapturer(client.buildDelegateRegistration({ fee: 25 * Math.pow(10, 8) }))).not.toThrow(/fee/)
-        expect(await errorCapturer(client.buildDelegateRegistration({ fee: 12.09 * Math.pow(10, 8) }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildDelegateRegistration({ fee: 25 * 1e8 }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildDelegateRegistration({ fee: 12.09 * 1e8 }))).not.toThrow(/fee/)
       })
     })
   })
@@ -437,8 +771,8 @@ describe('Services > Client', () => {
 
     describe('when the fee is smaller or equal to V1 fee (5)', () => {
       it('should not throw an Error', async () => {
-        expect(await errorCapturer(client.buildSecondSignatureRegistration({ fee: 5 * Math.pow(10, 8) }))).not.toThrow(/fee/)
-        expect(await errorCapturer(client.buildSecondSignatureRegistration({ fee: 3.09 * Math.pow(10, 8) }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildSecondSignatureRegistration({ fee: 5 * 1e8 }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildSecondSignatureRegistration({ fee: 3.09 * 1e8 }))).not.toThrow(/fee/)
       })
     })
   })
@@ -453,8 +787,8 @@ describe('Services > Client', () => {
 
     describe('when the fee is smaller or equal to V1 fee (0.1)', () => {
       it('should not throw an Error', async () => {
-        expect(await errorCapturer(client.buildTransfer({ fee: 0.1 * Math.pow(10, 8) }))).not.toThrow(/fee/)
-        expect(await errorCapturer(client.buildTransfer({ fee: 0.09 * Math.pow(10, 8) }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildTransfer({ fee: 0.1 * 1e8 }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildTransfer({ fee: 0.09 * 1e8 }))).not.toThrow(/fee/)
       })
     })
   })
@@ -469,8 +803,8 @@ describe('Services > Client', () => {
 
     describe('when the fee is smaller or equal to V1 fee (0.1)', () => {
       it('should not throw an Error', async () => {
-        expect(await errorCapturer(client.buildVote({ fee: 1 * Math.pow(10, 8) }))).not.toThrow(/fee/)
-        expect(await errorCapturer(client.buildVote({ fee: 0.9 * Math.pow(10, 8) }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildVote({ fee: 1 * 1e8 }))).not.toThrow(/fee/)
+        expect(await errorCapturer(client.buildVote({ fee: 0.9 * 1e8 }))).not.toThrow(/fee/)
       })
     })
   })

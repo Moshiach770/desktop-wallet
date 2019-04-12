@@ -8,16 +8,25 @@
     class="InputSwitch"
   >
     <div
-      class="w-full pt-4 pin-l transition text-theme-page-text h-10 flex flex-row justify-flex-start"
+      :class="isReverse ? 'flex-row-reverse' : 'flex-row'"
+      class="w-full pt-4 pin-l transition text-theme-page-text h-10 flex items-center justify-flex-start"
     >
-      <div class="mr-3 mt-1 text-lg">
-        {{ text }}
-      </div>
+      <slot>
+        <div
+          :class="[
+            isLarge ? 'text-lg' : 'text-base',
+            isReverse ? 'ml-3' : 'mr-3'
+          ]"
+          class="mt-1"
+        >
+          {{ text }}
+        </div>
+      </slot>
       <ButtonSwitch
+        v-model="model"
         :background-color="backgroundColor"
-        :is-active="isActive"
         :is-disabled="isDisabled"
-        @change="emitChange"
+        class="flex-none"
       />
     </div>
   </InputField>
@@ -70,12 +79,38 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    isLarge: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    isReverse: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
-  methods: {
-    emitChange (isActive) {
-      this.$emit('change', isActive)
+  data: vm => ({
+    inputIsActive: vm.isActive
+  }),
+
+  computed: {
+    model: {
+      get () {
+        return this.inputIsActive
+      },
+      set (value) {
+        this.inputIsActive = value
+        this.$emit('change', value)
+      }
+    }
+  },
+
+  watch: {
+    isActive (isActive) {
+      this.inputIsActive = isActive
     }
   }
 }

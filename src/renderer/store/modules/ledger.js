@@ -2,7 +2,7 @@ import cryptoLibrary from 'crypto'
 import { keyBy } from 'lodash'
 import logger from 'electron-log'
 import Vue from 'vue'
-import { crypto } from '@arkecosystem/crypto'
+import { crypto } from '@phantomcores/crypto'
 import eventBus from '@/plugins/event-bus'
 import ledgerService from '@/services/ledger-service'
 
@@ -125,7 +125,7 @@ export default {
     },
 
     /**
-     * Initialise ledger service with ark-ledger library.
+     * Initialise ledger service with phantom-ledger library.
      * @param {Number} slip44
      */
     async init ({ dispatch }, slip44) {

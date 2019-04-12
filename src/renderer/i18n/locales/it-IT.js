@@ -2,8 +2,8 @@ export default {
   COMMON: {
     ADDRESS: 'Indirizzo',
     ALL: 'Tutto',
-    APP_NAME: 'ARK Desktop Wallet',
-    APP_NAME_SHORT: 'ARK Desktop',
+    APP_NAME: 'PHANTOM Desktop Wallet',
+    APP_NAME_SHORT: 'PHANTOM Desktop',
     APPEARANCE: 'Aspetto',
     AVATAR: 'Avatar',
     BACK: 'Indietro',
@@ -66,29 +66,29 @@ export default {
       OWNER: 'Questo porta anche a maggiori responsabilità nei tuoi confronti, il proprietario del conto',
       WARNING: {
         ACCOUNT: 'A differenza del tuo conto bancario tradizionale, {CANNOT_RESTORE}',
-        CANNOT_RESTORE: 'password perdute, frasi segrete o fondi rubati non potranno essere ripristinati dal team ARK , dai Delegati e da nessun altro.'
+        CANNOT_RESTORE: 'password perdute, frasi segrete o fondi rubati non potranno essere ripristinati dal team PHANTOM , dai Delegati e da nessun altro.'
       },
       SECURITY: 'La sicurezza del tuo conto spetta esclusivamente a te.'
     },
     RESPONSIBILITY: {
       TITLE: 'La tua Responsabilità',
       STORAGE: {
-        EXPLANATION: 'La {PASSPHRASE} di ogni indirizzo portafoglio può firmare transazioni e muovere i fondi. Questo significa che se il tuo computer "muore", ma tu possiedi la tua frase segreta, potrai ancora accedere ai tuoi fondi. L\'ARK Desktop Wallet ha un\'ulteriore funzionalità che ti permette di settare anche un {ENCRYPTED}, per agevolare la gestione. Se il tuo computer "muore", non sarà possibile utilizzare la password cifrata per accedere ai fondi da una macchina differente. {NEED}.',
+        EXPLANATION: 'La {PASSPHRASE} di ogni indirizzo portafoglio può firmare transazioni e muovere i fondi. Questo significa che se il tuo computer "muore", ma tu possiedi la tua frase segreta, potrai ancora accedere ai tuoi fondi. L\'PHANTOM Desktop Wallet ha un\'ulteriore funzionalità che ti permette di settare anche un {ENCRYPTED}, per agevolare la gestione. Se il tuo computer "muore", non sarà possibile utilizzare la password cifrata per accedere ai fondi da una macchina differente. {NEED}.',
         PASSPHRASE: 'frase segreta',
         ENCRYPTED: 'password cifrata',
         NEED: 'Avrai bisogno della frase segreta'
       },
       BACKUP: {
         ALWAYS: 'Effettua sempre il backup della frase segreta e conservala in un luogo sicuro.',
-        OPTIONS: 'È possibile scriverla su carta spessa e archiviarne più copie in posti sicuri. È inoltre possibile memorizzarla su un\'unità flash crittografata. In alternativa, è possibile utilizzare un dispositivo hardware USB Ledger Nano S, disponibile su Ledger.com, per archiviare e accedere ai fondi e all\'ARK Desktop Wallet. Puoi collegare il tuo Ledger Nano S al tuo computer e accedere alla blockchain ARK senza dover inserire la tua frase segreta.'
+        OPTIONS: 'È possibile scriverla su carta spessa e archiviarne più copie in posti sicuri. È inoltre possibile memorizzarla su un\'unità flash crittografata. In alternativa, è possibile utilizzare un dispositivo hardware USB Ledger Nano S, disponibile su Ledger.com, per archiviare e accedere ai fondi e all\'PHANTOM Desktop Wallet. Puoi collegare il tuo Ledger Nano S al tuo computer e accedere alla blockchain PHANTOM senza dover inserire la tua frase segreta.'
       },
       REMEMBER: 'Ricorda, chiunque abbia la frase segreta può accedere ai tuoi fondi. Non condividere mai il tuo conto con nessuno ed evita di memorizzarlo in luoghi che sono suscettibili di hack, come il Cloud.'
     },
     TURN: {
       TITLE: 'Il tuo Turno',
-      KNOWLEDGE: 'Ora, armato della consapevolezza di quanto sia importante mantenere al sicuro le tue frasi segrete, sei pronto a rivendicare la tua autonomia finanziaria con ARK Desktop Wallet.',
-      SUPPORT: 'ARK è un ecosistema open source e se hai bisogno di assistenza, la community e il team ARK sono qui per aiutarti. Crea un post su reddit.ark.io o unisciti al sistema di chat in tempo reale su slack.ark.io.',
-      CONCLUSION: 'Tutti qui, al team di ARK.io, speraiamo ti piacerà utilizzare l\'ARK Desktop Wallet e partecipare nella rivoluzione blockchain!'
+      KNOWLEDGE: 'Ora, armato della consapevolezza di quanto sia importante mantenere al sicuro le tue frasi segrete, sei pronto a rivendicare la tua autonomia finanziaria con PHANTOM Desktop Wallet.',
+      SUPPORT: 'PHANTOM è un ecosistema open source e se hai bisogno di assistenza, la community e il team PHANTOM sono qui per aiutarti. Crea un post su reddit.phantom.io o unisciti al sistema di chat in tempo reale su slack.phantom.io.',
+      CONCLUSION: 'Tutti qui, al team di PHANTOM.io, speraiamo ti piacerà utilizzare l\'PHANTOM Desktop Wallet e partecipare nella rivoluzione blockchain!'
     }
   },
 
@@ -566,7 +566,7 @@ export default {
 
     WALLET_EXCHANGE: {
       CHANGELLY_TERMS: {
-        TITLE: 'Acquista {ticker} direttamente dall\'ARK Desktop Wallet tramite la nostra integrazione di Changelly',
+        TITLE: 'Acquista {ticker} direttamente dall\'PHANTOM Desktop Wallet tramite la nostra integrazione di Changelly',
         CONTENT: 'Changelly ti permette di scambiare altre criptovalute in {ticker} ed ha un\'opzione per acquistare {ticker} direttamente tramite le tue carte di credito o di debito.',
         CONFIRMATION: 'Ho letto e sono d\'accordo con i termini {terms} e {privacy} di Changelly. Facendo clic su {button}, riconosco e comprendo che la mia transazione potrebbe attivare la verifica AML/KYC in conformità con Changelly {kyc}.',
         TERMS_OF_USE: 'termini d\'uso',

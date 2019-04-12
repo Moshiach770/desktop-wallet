@@ -7,101 +7,153 @@
 [![License: MIT](https://badgen.now.sh/badge/license/MIT/green)](https://opensource.org/licenses/MIT)
 
 ## Download
-[Latest Release](https://github.com/ArkEcosystem/ark-desktop/releases)
+[Latest Release](https://github.com/ArkEcosystem/phantom-desktop/releases)
 
 ## Installing via Package Managers
 
-#### AUR
-For distros derived from Arch Linux the package is available in AUR, just run:
+### Arch Linux
 
-```
-yaourt -Sy ark-desktop
-```
+Install via [AUR](https://aur.archlinux.org/packages/phantom-desktop):
 
-#### Homebrew
-For Mac users the package is available in [Homebrew](https://brew.sh/):
+> Manjaro
 
-```
-brew update
-brew cask install arkclient
+```shell
+pamac build phantom-desktop
 ```
 
-## Features
-* Available on ***Windows***, ***Linux*** (Ubuntu/Debian) and ***MacOSX*** (signed).
-* No need to download ARK blockchain, just sync to the network: launch and use within seconds.
-* View any account from its address (transactions, delegate status and votes).
-* Label any account and add your own contacts.
-* Hardware wallet support : Ledger Nano S.
-* Real-time currency value (updated every 5 min) in USD, EUR, BTC, HKD, JPY, CNY, AUD, GBP, Rubble, ...
-* Autoconnect to a healthy ARK network peer. If the peer is not good anymore, it will automatically find a new one.
-* Send ark from / to any account.
-* Easily switch to a different network, or private chains.
-* Customized backgrounds and themes for better user experience.
-* Choose between dark or light mode.
-* Isolated processes on Windows and MacOSX to prevent from data sniffing or injection.
-* Translations (thanks to the ARK community) - help out http://osjc1wl.oneskyapp.com/collaboration/project?id=95031
-* Organise your accounts with virtual folders (for instance savings, personnal etc...) so you don't pay any transfer fee (stored locally).
-* Change your delegate vote.
-* When new version is available, message is shown in the right upper part.
-* Easy to update - download latest version, start installation program and it will automatically remove previous version and install new one.
-* Second signature supported.
-* (soon) Deposit or withdraw ARK using altcoins or USD (via exchange) - no registration needed.
-* (soon) Multisignature accounts.
-* **SAVE YOUR PASSPHRASE(S) - if you lose it, you lose access to that particular ARK address(es). There is no forgot my password option with blockchains and no one can help you retrieve it!**
+### Mac OS X
 
+Install via [Homebrew](https://brew.sh/):
 
-## Screenshots
-
-
-## Build
-
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. Optionally switch to node 8.11.2, because this is currently developed with this version:
-```
-nvm install 8.11.2
-nvm use
+```shell
+brew cask install phantom-desktop-wallet
 ```
 
-Install from source:
-```bash
-# Clone this repository
-git clone https://github.com/PhantomCore/ark-desktop
-# Go into the repository
-cd ark-desktop
+## Translations
+
+Translations are part of our [PHANTOM Development and Security Bounty Program](https://blog.phantom.io/phantom-development-and-security-bounty-program-a95122d06879).
+
+Full translations are considered to be `Tier 3`, while grammar fixes, typos, etc. are considered to be `Tier 6`.
+
+<details><summary>Full translations should involve 5 tasks</summary>
+
+ - Create a pull request for the language you are going to translate. If you have doubts about something, use English to explain them.
+ - Translate the textual content of the application, using the [English language file](https://github.com/ArkEcosystem/desktop-wallet/blob/develop/src/renderer/i18n/locales/en-US.js) as the reference. To do that, a new file, with the language locale code should be created. The name of the file should be a valid [RFC 5646](https://tools.ietf.org/html/rfc5646) and should be located at `src/renderer/i18n/locales/LANGUAGE.js`. Thanks to [vue-i18n-extract](https://github.com/pixari/vue-i18n-extract), it is possible to execute `yarn i18n src/renderer/i18n/locales/LANGUAGE.js` to find suggestions of missing translations.
+ - Add the language to the [English language file](https://github.com/ArkEcosystem/desktop-wallet/blob/develop/src/renderer/i18n/locales/en-US.js) at the `LANGUAGES` key.
+ - Update the [date and time formats file](https://github.com/ArkEcosystem/desktop-wallet/blob/develop/src/renderer/i18n/date-time-formats.js) to include the short and long format that are used commonly by native speakers.
+ - Update the [number formats file](https://github.com/ArkEcosystem/desktop-wallet/blob/develop/src/renderer/i18n/number-formats.js) to include the preferred way of displaying currencies used commonly by native speakers.
+ - Add the language at the `I18N.enabledLocales` array at the [main configuration file](https://github.com/ArkEcosystem/desktop-wallet/blob/develop/config/index.js). This step is necessary to make the language available.
+ - Execute the application. Go to the [development section](https://github.com/ArkEcosystem/desktop-wallet#development) to learn how to install the requirements and execute it.
+
+</details>
+
+## Development
+
+### Requirements
+
+#### Ubuntu
+In Ubuntu the development files of `libudev` are necessary:
+```
+sudo apt-get install libudev-dev libusb-1.0-0-dev
+```
+
+#### Windows
+- Python 2.7
+- Visual Studio 2017
+
+#### Node 11
+To download, head over to [here](https://nodejs.org/en/) and download Node 11.
+
+If you already have npm installed, you can run
+```
+npm install -g n
+sudo n 11
+```
+
+#### Yarn
+Install the Yarn dependency manager
+```
+npm install -g yarn
+```
+
+### Commands
+
+<details><summary>List of commands</summary>
+
+``` bash
 # Install dependencies
-npm install
+yarn install
+
+# Execute the application. Making changes in the code, updates the application (hot reloading).
+yarn dev
+
+# Lint all JS/Vue files in the `src` and `__tests__`
+yarn lint
+
+# Lint, and fix, all JS/Vue files in `src` and `__tests__`
+yarn lint:fix
+
+# Check that all dependencies are used
+yarn depcheck
+
+# Collect the code and produce a compressed file
+yarn pack
+
+# Build electron application for production (Current OS)
+yarn build
+
+# Build electron application for production (Windows)
+yarn build:win
+
+# Build electron application for production (Mac)
+yarn build:mac
+
+# Build electron application for production (Linux)
+yarn build:linux
+
+# Run unit and end-to-end tests
+yarn test
+
+# Run unit tests
+yarn test:unit
+
+# Run unit tests and generate and display the coverage report
+yarn test:unit:coverage
+
+# Run unit tests and watch for changes to re-run the tests
+yarn test:unit:watch
+
+# Run end-to-end tests, without building the application
+yarn test:e2e
+
+# Build the application and run end-to-end tests
+yarn test:e2e:full
+
+# List what translations are missing or unused on a specific language. It could capture suggestions that are not accurate
+yarn i18n 'src/renderer/i18n/locales/LANGUAGE.js'
+
+# List what English messages are missing or unused (English is the default language)
+yarn i18n:en-US
+
+# List what translations are missing or unused on every language
+yarn i18n:all
 ```
 
-* In some cases, [node-hid](https://github.com/node-hid/node-hid) doesn't provide pre-built binaries, so is necessary to install the [node-hid dependencies](https://github.com/node-hid/node-hid#compiling-from-source) to build them from source before running `npm install`.
-
-Then start:
-```bash
-npm start
-```
-
-### Requirements to build from OS X
-
-```
-brew tap Homebrew/bundle
-brew bundle
-```
+</details>
 
 ## Security
 
-If you discover a security vulnerability within this application, please send an e-mail to security@ark.io. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within this project, please send an e-mail to security@phantom.io. All security vulnerabilities will be promptly addressed.
 
-## Contributing
+## Credits
 
-* If you find any bugs, submit an [issue](../../issues) or open [pull-request](../../pulls), helping us catch and fix them.
-* Engage with other users and developers on [Phantom Slack](https://ark.io/slack/).
-* Join to our [gitter](https://gitter.im/ark-developers/Lobby).
-* [Contribute bounties](./CONTRIBUTING.md).
-
-## Authors
-- FX Thoorens <fx@ark.io>
-- Guillaume Verbal <doweig@ark.io>
-- Lúcio Rubens <lucio@ark.io>
-- Juan Martín <juan@ark.io>
+ - [Alex Barnsley](https://github.com/alexbarnsley)
+ - [ItsANameToo](https://github.com/ItsANameToo)
+ - [Juan A. Martín](https://github.com/j-a-m-l)
+ - [Lúcio Rubens](https://github.com/luciorubeens)
+ - [Mario Vega](https://github.com/mvega3)
+ - [All Contributors](../../contributors)
 
 ## License
 
-Phantom Desktop is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+[MIT](LICENSE) © [ArkEcosystem](https://phantom.io)

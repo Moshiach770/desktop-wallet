@@ -1,26 +1,25 @@
 {
-  "productName": "PhantomClient",
   "private": true,
-  "name": "PhantomClient",
+  "name": "phantom-desktop-wallet",
   "version": "2.3.2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PhantomEcosystem/desktop-wallet.git"
+    "url": "git+https://github.com/ArkEcosystem/desktop-wallet.git"
   },
-  "author": "PhantomClient <admin@phantom.org>",
+  "author": "ArkEcosystem <info@phantom.io>",
   "contributors": [
-    "Alex Barnsley <alex@ark.io>",
+    "Alex Barnsley <alex@phantom.io>",
     "ItsANameToo <itsanametoo@protonmail.com>",
-    "Juan A. Martín <juan@ark.io>",
-    "Lúcio Rubens <lucio@ark.io>",
-    "Mario Vega <mario@ark.io>"
+    "Juan A. Martín <juan@phantom.io>",
+    "Lúcio Rubens <lucio@phantom.io>",
+    "Mario Vega <mario@phantom.io>"
   ],
-  "description": "Phantom Desktop Wallet",
+  "description": "Ark Ecosystem Desktop Wallet",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/PhantomChain/desktop-wallet/issues"
+    "url": "https://github.com/ArkEcosystem/desktop-wallet/issues"
   },
-  "homepage": "https://github.com/PhantomChain/desktop-wallet#readme",
+  "homepage": "https://github.com/ArkEcosystem/desktop-wallet#readme",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -50,11 +49,11 @@
     "test:unit:watch": "jest --config __tests__/unit.jest.conf.js --watch"
   },
   "dependencies": {
-    "@arkecosystem/client": "^0.1.20",
-    "@arkecosystem/crypto": "^2.2.2",
+    "@phantomcores/client": "^0.1.20",
     "@arkecosystem/ledger-transport": "^0.1.0",
     "@babel/runtime": "^7.4.2",
     "@ledgerhq/hw-transport-node-hid": "^4.24.0",
+    "@phantomcores/crypto": "^2.2.4",
     "about-window": "^1.12.1",
     "animate.css": "^3.7.0",
     "async": "^2.6.2",
@@ -79,6 +78,7 @@
     "postcss-import": "^12.0.1",
     "qrious": "^4.0.2",
     "semver": "^6.0.0",
+    "threads": "^0.12.1",
     "trunc-html": "^1.1.2",
     "v-tooltip": "^2.0.0-rc.33",
     "vue": "^2.6.10",
@@ -165,45 +165,67 @@
     "webpack-hot-middleware": "^2.24.3"
   },
   "build": {
-    "productName": "Phantom Desktop Wallet",
+    "productName": "Ark Desktop Wallet",
     "appId": "io.phantom.desktop-wallet",
     "compression": "maximum",
     "artifactName": "${name}-${os}-${arch}-${version}.${ext}",
     "protocols": {
-      "name": "Phantom URI scheme",
+      "name": "Ark URI scheme",
       "schemes": [
         "phantom"
       ],
       "role": "Viewer"
     },
+    "directories": {
+      "output": "build/target"
+    },
+    "files": [
+      "dist/electron/**/*"
+    ],
     "mac": {
-      "category": "finance"
+      "category": "public.app-category.finance",
+      "icon": "build/icons/icon.icns"
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icons/icon.ico"
     },
     "linux": {
-      "description": "A Lite Client used to securely connect to the Phantom network and manage your Phantom assets.",
+      "category": "Utility",
+      "executableName": "phantom-desktop-wallet",
+      "icon": "build/icons",
       "target": [
+        "AppImage",
         "deb",
-        "tar.xz"
+        "tar.gz"
       ],
       "desktop": {
         "MimeType": "x-scheme-handler/phantom;"
-      },
-      "category": "Network"
+      }
     },
     "deb": {
-      "synopsis": "Phantom Desktop Wallet"
+      "depends": [
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3",
+        "libudev-dev"
+      ]
     },
     "dmg": {
-      "icon": "build/icon.icns"
+      "icon": "build/icons/icon.icns"
     },
     "nsis": {
       "perMachine": true,
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
     }
   }
 }

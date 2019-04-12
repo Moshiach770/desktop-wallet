@@ -10,7 +10,7 @@
     <div
       class="AppSidemenu__container flexify w-full md:h-full justify-between"
     >
-      <!-- ARK logo -->
+      <!-- PHANTOM logo -->
       <RouterLink
         :title="$t('APP_SIDEMENU.DASHBOARD')"
         :to="{ name: 'dashboard' }"

@@ -47,7 +47,7 @@
   </g>
   <g id="Logo">
     <circle id="Circle1" serif:id="Circle" cx="204.5" cy="225.5" r="30.5" style="fill:#c9292c;"/>
-    <path id="ARK" d="M219,238l-14.95,-25l-15.05,25l15.05,-16.26l14.95,16.26Zm-17.61,-9.64l5.29,0l-2.62,-2.8l-2.67,2.8Zm-1.71,1.81l-2.41,2.61l13.52,0l-2.41,-2.61l-8.7,0Z" style="fill:#fff;fill-rule:nonzero;"/>
+    <path id="PHANTOM" d="M219,238l-14.95,-25l-15.05,25l15.05,-16.26l14.95,16.26Zm-17.61,-9.64l5.29,0l-2.62,-2.8l-2.67,2.8Zm-1.71,1.81l-2.41,2.61l13.52,0l-2.41,-2.61l-8.7,0Z" style="fill:#fff;fill-rule:nonzero;"/>
   </g>
   <defs>
     <image id="_Image3" width="97px" height="64px" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGEAAABACAYAAAAK9hkwAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABs0lEQVR4nO3cS26DMBRAUWBPVdVx180YITaVQUREwAZj/D7ge6eRosjHD0jVuG2c9fP7/yf5/tPYD5Lvn1Nr/QGkFz0laxh1BA+LfpQ2igrCHRY+lgaIKMKdFz+UFEhxhKctfKjSGMUQalj8daUwiiDUCLDsKsYlhNoXf10uRhYCix8vB+I0AgBpncFIRmDx80rBSEIA4FpHEIcIAJRpDyKKwOKXLwYRRABAtjXGBgEAnZYQXwgA6DZDfBAAsGka+6FtGgCsawGwr7P+AASCi0BwEAgOAsFBIDgIBAeB4CC+MTuISTBuGvsBBAeB4KCuaez/P7/2mATD5s0PgoM+CFyS7GISjFpu+i72AunFJBi03uwbBKZBPyZBudAmDyIwDboxCYrFNncUgWnQi0lQam9T7yIwDTrxcymFLv9cag6IvFKuJtwTBEu9nJ/6HTPTkN6Z++mpSeBGLRPHKhRO5ViFOSC2qR4wsgyMd1cu1Zx3VCDT847W1YhR4mGFM/AyK/mkKHYa5FMxJB7Txc9FfQqG5HcktROC74px+8NpY3kHeeQxzXt5AbH8k4w5Qqjaju9/ATgBvJTQ/+cxAAAAAElFTkSuQmCC"/>

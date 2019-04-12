@@ -1,5 +1,5 @@
 exports.APP = {
-  website: 'https://ark.io',
+  website: 'https://phantom.io',
   transactionExpiryMinutes: 45
 }
 
@@ -9,12 +9,12 @@ exports.NETWORKS = [
 ]
 
 exports.PEERS = {
-  'ark.mainnet': require('./peers/mainnet.json'),
-  'ark.devnet': require('./peers/devnet.json')
+  'phantom.mainnet': require('./peers/mainnet.json'),
+  'phantom.devnet': require('./peers/devnet.json')
 }
 
 exports.ANNOUNCEMENTS = {
-  rssUrl: 'https://blog.ark.io/feed'
+  rssUrl: 'https://blog.phantom.io/feed'
 }
 
 exports.VENDOR_FIELD = {

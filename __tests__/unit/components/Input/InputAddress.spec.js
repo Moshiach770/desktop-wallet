@@ -15,7 +15,7 @@ describe('InputAddress', () => {
       i18n,
       propsData: {
         value: '',
-        pubKeyHash: 23
+        pubKeyHash: 55
       },
       mocks: {
         wallet_name: value => value

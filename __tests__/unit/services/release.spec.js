@@ -4,7 +4,7 @@ import errorCapturer from '../__utils__/error-capturer'
 
 import release from '@/services/release'
 
-const releaseApiUrl = 'https://api.github.com/repos/ArkEcosystem/desktop-wallet/releases/latest'
+const releaseApiUrl = 'https://api.github.com/repos/PhantomCore/desktop-wallet/releases/latest'
 const releaseUrl = 'https://github.com/ArkEcosystem/desktop-wallet/releases/latest'
 
 describe('Services > Release', () => {

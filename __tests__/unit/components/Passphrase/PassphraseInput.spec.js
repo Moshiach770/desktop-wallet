@@ -15,7 +15,7 @@ describe('PassphraseInput', () => {
       i18n,
       propsData: {
         value: '',
-        pubKeyHash: 23
+        pubKeyHash: 55
       }
     }, config))
   }

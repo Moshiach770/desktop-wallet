@@ -48,7 +48,7 @@ Broadcasting to multiple peers fixed and improved usability for custom networks 
 - Show "Unvote" action on delegate tab when using Ledger (#1032)
 - Allow selecting the balance on the wallet page heading (#994)
 - Broadcasting modal not closing on unvote (#1038)
-- Update @arkecosystem/client (#1036)
+- Update @phantomcores/client (#1036)
 - Pasting or writing numbers with colon (",") on the send transfer inputs (#1009)
 
 ## Previous versions

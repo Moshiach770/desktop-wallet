@@ -1,15 +1,15 @@
 {
-  "id": "ark.mainnet",
-  "name": "ARK Mainnet",
-  "title": "ARK Mainnet",
-  "server": "https://explorer.ark.io:8443",
-  "description": "The ARK Mainnet should be chosen in most cases.",
+  "id": "phantom.mainnet",
+  "name": "PHANTOM Mainnet",
+  "title": "PHANTOM Mainnet",
+  "server": "http://explorer.phantom.org:4003",
+  "description": "The PHANTOM Mainnet should be chosen in most cases.",
   "imagePath": "networks/ark.png",
   "apiVersion": 2,
   "slip44": "111",
   "market": {
     "enabled": true,
-    "ticker": "ARK"
+    "ticker": "XPS"
   },
   "feeStatistics": [
     {
@@ -47,39 +47,23 @@
   ],
   "constants": {
     "activeDelegates": 51,
-    "epoch": "2017-03-21T13:00:00.000Z"
+    "epoch": "2019-01-03T12:00:00.000Z"
   },
   "vendorField": {
     "maxLength": 64
   },
-  "nethash": "6e84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
-  "explorer": "https://explorer.ark.io",
-  "token": "ARK",
+  "nethash": "63b3351133e5721c199594c9d4f0e0e57adc5554216a390d3ea77c38366d01c9",
+  "explorer": "http://explorer.phantom.org",
+  "token": "XPS",
   "subunit": "arktoshi",
-  "symbol": "Ѧ",
+  "symbol": "ⓟ",
   "fractionDigits": 8,
-  "version": 23,
+  "version": 55,
   "wif": 170,
   "knownWallets": {
-    "AagJoLEnpXYkxYdYkmdDSNMLjjBkLJ6T67": "ACF Hot Wallet",
-    "AWkBFnqvCF4jhqPSdE2HBPJiwaf67tgfGR": "ACF Hot Wallet (old)",
-    "AYCTHSZionfGoQsRnv5gECEuFWcZXS38gs": "Ark Bounty",
-    "AZmQJ2P9xg5j6VPZWjcTzWDD4w7Qww2KGX": "Ark GitHub Bounty",
-    "ANkHGk5uZqNrKFNY5jtd4A88zzFR3LnJbe": "Ark Hot Wallet",
-    "ALgvTAoz5Vi9easHqBK6aEMKatHb4beCXm": "Ark Shield I",
-    "AdTyTzaXPtj1J1DzTgVksa9NYdUuXCRbm1": "Ark Shield II",
-    "AUDud8tvyVZa67p3QY7XPRUTjRGnWQQ9Xv": "Ark Team",
-    "AFrPtEmzu6wdVpa2CnRDEKGQQMWgq8nE9V": "Binance",
-    "AQkyi31gUbLuFp7ArgH9hUCewg22TkxWpk": "Binance Cold Wallet",
-    "AdS7WvzqusoP759qRo6HDmUz2L34u4fMHz": "Binance Cold Wallet II",
-    "Aakg29vVhQhJ5nrsAHysTUqkTBVfmgBSXU": "Binance Cold Wallet III",
-    "AUexKjGtgsSpVzPLs6jNMM6vJ6znEVTQWK": "Bittrex",
-    "AdA5THjiVFAWhcMo5QyTKF1Y6d39bnPR2F": "Changelly",
-    "AcPwcdDbrprJf8FNCE3dKZaTvPJT8y4Cqi": "COSS",
-    "AJbmGnDAx9y91MQCDApyaqZhn6fBvYX9iJ": "Cryptopia",
-    "AewxfHQobSc49a4radHp74JZCGP8LRe4xA": "Genesis Wallet",
-    "AcVHEfEmFJkgoyuNczpgyxEA3MZ747DRAu": "Livecoin",
-    "ARXhacG5MPdT1ehWPTPo8jtfC5NrS29eKS": "OKEx",
-    "ANQftoXeWoa9ud9q9dd2ZrUpuKinpdejAJ": "Upbit"
+    "P9atrUx6b8naSSBedmqkvN6aAm1iiJQGbN": "Binance",
+    "PMUFqCp7QeGrfrr7eXPZsMp6SFExxkXscq": "Bitrex",
+    "PDWDxeMCoGYBpTL4cbyJ6F4Vj2XmkDRnpp": "HitBTC",
+    "PDXkr5cG5Wi7eobuQXBrceHARq12ekBrxa": "Kucoin"
   }
 }

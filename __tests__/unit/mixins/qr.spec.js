@@ -17,7 +17,7 @@ describe('Mixins > Qr', () => {
 
   describe('qr_getAddress', () => {
     it('should return an address from an uri string', () => {
-      expect(wrapper.vm.qr_getAddress('ark:AewxfHQobSc49a4radHp74JZCGP8LRe4xA')).toEqual('AewxfHQobSc49a4radHp74JZCGP8LRe4xA')
+      expect(wrapper.vm.qr_getAddress('phantom:AewxfHQobSc49a4radHp74JZCGP8LRe4xA')).toEqual('AewxfHQobSc49a4radHp74JZCGP8LRe4xA')
     })
 
     it('should return an address from a json object', () => {
@@ -29,7 +29,7 @@ describe('Mixins > Qr', () => {
     })
 
     it('should return undefined or the same string from an incorrect entry', () => {
-      expect(wrapper.vm.qr_getAddress('ark:address')).toEqual('ark:address')
+      expect(wrapper.vm.qr_getAddress('phantom:address')).toEqual('phantom:address')
       expect(wrapper.vm.qr_getAddress('{"b": "address"}')).toBeUndefined()
       expect(wrapper.vm.qr_getAddress('asdf')).toEqual('asdf')
     })

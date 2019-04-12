@@ -1,6 +1,4 @@
-import ApiClient from '@arkecosystem/client'
-import { crypto, transactionBuilder } from '@arkecosystem/crypto'
-import axios from 'axios'
+import { crypto, transactionBuilder } from '@phantomcores/crypto'
 import { castArray, chunk, orderBy } from 'lodash'
 import dayjs from 'dayjs'
 import moment from 'moment'
@@ -9,6 +7,25 @@ import semver from 'semver'
 import { V1 } from '@config'
 import store from '@/store'
 import eventBus from '@/plugins/event-bus'
+import OriginalClient from '@phantomcores/client'
+import Http from '@/services/http'
+import BackgroundHttpClient from '@/services/background-http-client'
+// import ApiClient from '@phantomcores/client'
+
+const httpClient = new Http()
+
+/**
+ * This class has the mission of monkey-patching the API client to establish
+ * its inner HTTP client.
+ * It can be used to run requests in workers.
+ * TODO override static `findPeers` to make its request on background too
+ */
+class ApiClient extends OriginalClient {
+  setConnection (host) {
+    this.http = new BackgroundHttpClient(host, this.version)
+    this.http.__httpClient = httpClient.request
+  }
+}
 
 export default class ClientService {
   /*
@@ -31,7 +48,7 @@ export default class ClientService {
    * @returns {Object}
    */
   static async fetchNetworkConfig (server, apiVersion, timeout) {
-    const client = new ApiClient(server, apiVersion)
+    const client = new ApiClient(server, 1)
     if (timeout) {
       client.http.timeout = timeout
     }
@@ -58,7 +75,7 @@ export default class ClientService {
    */
   static async fetchPeerConfig (host, timeout = 3000) {
     try {
-      const { data } = await axios({
+      const { data } = await httpClient.request({
         url: `${host}/config`,
         method: 'GET',
         headers: {
@@ -747,7 +764,7 @@ export default class ClientService {
     const scheme = currentPeer.isHttps ? 'https://' : 'http://'
     const host = `${scheme}${currentPeer.ip}:${currentPeer.port}/peer/transactions`
     const network = store.getters['session/network']
-    const response = await axios({
+    const response = await httpClient.request({
       url: host,
       data: { transactions: castArray(transactions) },
       method: 'POST',

@@ -132,7 +132,7 @@ export default {
     },
 
     votingUrl () {
-      return 'https://docs.phantom.io/tutorials/usage-guides/how-to-vote-in-the-phantom-desktop-wallet.html'
+      return 'https://docs.phantom.org/tutorials/usage-guides/how-to-vote-in-the-phantom-desktop-wallet.html'
     }
   },
 

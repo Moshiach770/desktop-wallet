@@ -31,7 +31,7 @@ brew cask install phantom-desktop-wallet
 
 ## Translations
 
-Translations are part of our [PHANTOM Development and Security Bounty Program](https://blog.phantom.io/phantom-development-and-security-bounty-program-a95122d06879).
+Translations are part of our [PHANTOM Development and Security Bounty Program](https://blog.phantom.org/phantom-development-and-security-bounty-program-a95122d06879).
 
 Full translations are considered to be `Tier 3`, while grammar fixes, typos, etc. are considered to be `Tier 6`.
 
@@ -143,7 +143,7 @@ yarn i18n:all
 
 ## Security
 
-If you discover a security vulnerability within this project, please send an e-mail to security@phantom.io. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within this project, please send an e-mail to security@phantom.org. All security vulnerabilities will be promptly addressed.
 
 ## Credits
 
@@ -156,4 +156,4 @@ If you discover a security vulnerability within this project, please send an e-m
 
 ## License
 
-[MIT](LICENSE) © [ArkEcosystem](https://phantom.io)
+[MIT](LICENSE) © [ArkEcosystem](https://phantom.org)

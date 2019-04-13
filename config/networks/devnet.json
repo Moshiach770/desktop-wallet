@@ -2,7 +2,7 @@
   "id": "phantom.devnet",
   "name": "PHANTOM Devnet",
   "title": "PHANTOM Devnet",
-  "server": "https://dexplorer.phantom.io:8443",
+  "server": "https://dexplorer.phantom.org:8443",
   "description": "The PHANTOM Devnet is only used for R&D by engineers.",
   "imagePath": "networks/phantom.devnet.svg",
   "apiVersion": 2,
@@ -53,7 +53,7 @@
     "maxLength": 64
   },
   "nethash": "2a44f340d76ffc3df204c5f38cd355b7496c9065a1ade2ef92071436bd72e867",
-  "explorer": "https://dexplorer.phantom.io",
+  "explorer": "https://dexplorer.phantom.org",
   "token": "DARK",
   "subunit": "darktoshi",
   "symbol": "Dⓟ",

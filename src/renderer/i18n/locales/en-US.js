@@ -66,7 +66,7 @@ export default {
       OWNER: 'This also brings greater responsibility for you, the account owner.',
       WARNING: {
         ACCOUNT: 'Unlike your traditional bank account, {CANNOT_RESTORE}.',
-        CANNOT_RESTORE: 'lost passwords, passphrases or stolen funds cannot be restored by the delegates, PHANTOM.io team, or anyone else'
+        CANNOT_RESTORE: 'lost passwords, passphrases or stolen funds cannot be restored by the delegates, phantom.org team, or anyone else'
       },
       SECURITY: 'The security of your account is solely up to you.'
     },
@@ -87,8 +87,8 @@ export default {
     TURN: {
       TITLE: 'Your Turn',
       KNOWLEDGE: 'Now, armed with the knowledge of how important it is to keep your passphrases safe, you are ready to claim your financial autonomy with the PHANTOM Desktop Wallet.',
-      SUPPORT: 'PHANTOM is an open-source ecosystem and if you need assistance, the PHANTOM community and team is here to help. Create a post on reddit.phantom.io, or join the real-time chat system at slack.phantom.io.',
-      CONCLUSION: 'Everyone here on the PHANTOM.io team hopes you enjoy using the PHANTOM Desktop Wallet to participate in the blockchain revolution!'
+      SUPPORT: 'PHANTOM is an open-source ecosystem and if you need assistance, the PHANTOM community and team is here to help. Create a post on reddit.phantom.org, or join the real-time chat system at slack.phantom.org.',
+      CONCLUSION: 'Everyone here on the phantom.org team hopes you enjoy using the PHANTOM Desktop Wallet to participate in the blockchain revolution!'
     }
   },
 

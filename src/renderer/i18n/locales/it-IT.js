@@ -87,8 +87,8 @@ export default {
     TURN: {
       TITLE: 'Il tuo Turno',
       KNOWLEDGE: 'Ora, armato della consapevolezza di quanto sia importante mantenere al sicuro le tue frasi segrete, sei pronto a rivendicare la tua autonomia finanziaria con PHANTOM Desktop Wallet.',
-      SUPPORT: 'PHANTOM è un ecosistema open source e se hai bisogno di assistenza, la community e il team PHANTOM sono qui per aiutarti. Crea un post su reddit.phantom.io o unisciti al sistema di chat in tempo reale su slack.phantom.io.',
-      CONCLUSION: 'Tutti qui, al team di PHANTOM.io, speraiamo ti piacerà utilizzare l\'PHANTOM Desktop Wallet e partecipare nella rivoluzione blockchain!'
+      SUPPORT: 'PHANTOM è un ecosistema open source e se hai bisogno di assistenza, la community e il team PHANTOM sono qui per aiutarti. Crea un post su reddit.phantom.org o unisciti al sistema di chat in tempo reale su slack.phantom.org.',
+      CONCLUSION: 'Tutti qui, al team di phantom.org, speraiamo ti piacerà utilizzare l\'PHANTOM Desktop Wallet e partecipare nella rivoluzione blockchain!'
     }
   },
 

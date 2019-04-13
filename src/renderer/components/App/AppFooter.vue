@@ -16,7 +16,7 @@ export default {
 
   data: () => ({
     text: '',
-    url: 'https://phantom.io'
+    url: 'https://phantom.org'
   }),
 
   created () {

@@ -234,6 +234,6 @@
   "FirstValueInArray": true,
   "ConversionType": {
     "type": "multiply",
-    "conversionSymbol": "BTC"
+    "conversionSymbol": "USD"
   }
 }

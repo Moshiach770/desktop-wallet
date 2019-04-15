@@ -12,9 +12,9 @@
   resolved "https://registry.yarnpkg.com/7zip/-/7zip-0.0.6.tgz#9cafb171af82329490353b4816f03347aa150a30"
   integrity sha1-nK+xca+CMpSQNTtIFvAzR6oVCjA=
 
-"@arkecosystem/client@^0.1.20":
+"@PhantomChain/client@^0.1.20":
   version "0.1.20"
-  resolved "https://registry.yarnpkg.com/@arkecosystem/client/-/client-0.1.20.tgz#950d0e451521299f4f91d08b6e75de57ba8e5dfd"
+  resolved "https://registry.yarnpkg.com/@PhantomChain/client/-/client-0.1.20.tgz#950d0e451521299f4f91d08b6e75de57ba8e5dfd"
   integrity sha512-ka6y2pELzxcpn2dJf0+JXNBeOb7RY3gjxneIhcCGbUDQIsRzsxxDRGzDXs52h4xAS8V+mKOFDaU44bmHnnQLJA==
   dependencies:
     axios "^0.18.0"
@@ -22,9 +22,9 @@
     lodash.orderby "^4.6.0"
     lodash.shuffle "^4.2.0"
 
-"@arkecosystem/crypto@^2.2.2":
+"@PhantomChain/crypto@^2.2.2":
   version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@arkecosystem/crypto/-/crypto-2.2.2.tgz#84d54fb7fc90b908de9d125564f6e3201488927a"
+  resolved "https://registry.yarnpkg.com/@PhantomChain/crypto/-/crypto-2.2.2.tgz#84d54fb7fc90b908de9d125564f6e3201488927a"
   integrity sha512-CRKZNdcdba3Cg/Z90qbartJDVsI8H3lmEgPgu2w8g2XgriAf6OhDa2jnI/HPcrTEGEehi6fFwv/5IlzwK3POvA==
   dependencies:
     bignumber.js "^8.0.2"
@@ -47,9 +47,9 @@
     tiny-glob "^0.2.6"
     wif "^2.0.6"
 
-"@arkecosystem/ledger-transport@^0.1.0":
+"@PhantomChain/ledger-transport@^0.1.0":
   version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@arkecosystem/ledger-transport/-/ledger-transport-0.1.0.tgz#55de50cec3cd8b8cf43fb6180039ccae85cdc594"
+  resolved "https://registry.yarnpkg.com/@PhantomChain/ledger-transport/-/ledger-transport-0.1.0.tgz#55de50cec3cd8b8cf43fb6180039ccae85cdc594"
   integrity sha512-ViDuJf3Oa42tNFnxabCLWMXJr3E9+ROFXvTOaiHjprsSC5IXPIp6MNVg14PpAKKrCuYJ50H7DvTHkceHTkEAHg==
   dependencies:
     "@ledgerhq/hw-transport" "^4.7.3"

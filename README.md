@@ -2,12 +2,12 @@
 
 ![Phantom Desktop Wallet](./banner.png)
 
-[![Build Status](https://badgen.now.sh/circleci/github/ArkEcosystem/desktop-wallet)](https://circleci.com/gh/ArkEcosystem/desktop-wallet)
-[![Latest Version](https://badgen.now.sh/github/release/ArkEcosystem/desktop-wallet)](https://github.com/PhantomChain/desktop-wallet/releases)
+[![Build Status](https://badgen.now.sh/circleci/github/PhantomChain/desktop-wallet)](https://circleci.com/gh/PhantomChain/desktop-wallet)
+[![Latest Version](https://badgen.now.sh/github/release/PhantomChain/desktop-wallet)](https://github.com/PhantomChain/desktop-wallet/releases)
 [![License: MIT](https://badgen.now.sh/badge/license/MIT/green)](https://opensource.org/licenses/MIT)
 
 ## Download
-[Latest Release](https://github.com/ArkEcosystem/phantom-desktop/releases)
+[Latest Release](https://github.com/PhantomChain/phantom-desktop/releases)
 
 ## Installing via Package Managers
 
@@ -156,4 +156,4 @@ If you discover a security vulnerability within this project, please send an e-m
 
 ## License
 
-[MIT](LICENSE) © [ArkEcosystem](https://phantom.org)
+[MIT](LICENSE) © [PhantomChain](https://phantom.org)

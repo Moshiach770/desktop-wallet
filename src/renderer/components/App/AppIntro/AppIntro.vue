@@ -301,7 +301,7 @@ export default {
 
 <style lang="postcss" scoped>
 .AppIntro__1 .AppIntroScreen__container__left {
-  background-color: #c9292c;
+  background-color: #352e2e;
 }
 .AppIntro__1__languages {
   @apply .border-2 .rounded

@@ -29,7 +29,7 @@ describe('Mixins > Formatter', () => {
         session_network: network,
         $store: {
           getters: {
-            'session/currency': 'BTC'
+            'session/currency': 'USD'
           }
         }
       }

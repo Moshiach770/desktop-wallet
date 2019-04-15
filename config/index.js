@@ -65,7 +65,7 @@ exports.MARKET = {
   source: {
     baseUrl: 'https://min-api.cryptocompare.com'
   },
-  defaultCurrency: 'BTC',
+  defaultCurrency: 'USD',
   crypto: [
     'BTC',
     'ETH',

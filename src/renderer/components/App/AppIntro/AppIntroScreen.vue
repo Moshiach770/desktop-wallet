@@ -2,21 +2,11 @@
   <div class="AppIntroScreen flex flex-row w-full h-full">
     <div class="AppIntroScreen__container__left flex-1 animated fadeIn rounded-lg hidden lg:block">
       <div
-        v-if="showLogo"
-        class="AppIntroScreen__container__left__logo"
-      >
-        <img
-          :src="assets_loadImage('phantom-logo.png')"
-          class="h-full"
-        >
-      </div>
-      <div
         :class="showLogo ? 'h-3/5 w-3/5 flex ' : 'h-full w-full'"
         class="h-full w-full flex items-center justify-center"
       >
         <img
-          :class="showLogo ? 'h-3/5 w-3/5' : 'h-full w-full'"
-          :src="assets_loadImage(image)"
+          :src="assets_loadImage('phantom-logo.png')"
         >
       </div>
     </div>

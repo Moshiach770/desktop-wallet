@@ -14,7 +14,7 @@
     "Lúcio Rubens <lucio@ark.io>",
     "Mario Vega <mario@ark.io>"
   ],
-  "description": "Ark Ecosystem Desktop Wallet",
+  "description": "Phantom Ecosystem Desktop Wallet",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ArkEcosystem/desktop-wallet/issues"
@@ -165,12 +165,12 @@
     "webpack-hot-middleware": "^2.24.3"
   },
   "build": {
-    "productName": "Ark Desktop Wallet",
+    "productName": "Phantom Desktop Wallet",
     "appId": "io.phantom.desktop-wallet",
     "compression": "maximum",
     "artifactName": "${name}-${os}-${arch}-${version}.${ext}",
     "protocols": {
-      "name": "Ark URI scheme",
+      "name": "Phantom URI scheme",
       "schemes": [
         "phantom"
       ],

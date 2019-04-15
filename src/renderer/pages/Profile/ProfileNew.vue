@@ -13,7 +13,7 @@
           </p>
 
           <img
-            :src="assets_loadImage(`pages/profile-new/step-${step}.svg`)"
+            :src="assets_loadImage('phantom-logo.png')"
             :title="$t(`PAGES.PROFILE_NEW.STEP${step}.INSTRUCTIONS.HEADER`)"
             class="w-full xl:w-4/5 mt-10"
           >

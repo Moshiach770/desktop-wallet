@@ -4,7 +4,7 @@
   "title": "PHANTOM Mainnet",
   "server": "http://explorer.phantom.org:4003",
   "description": "The PHANTOM Mainnet should be chosen in most cases.",
-  "imagePath": "networks/ark.png",
+  "imagePath": "networks/phantom.mainnet",
   "apiVersion": 2,
   "slip44": "111",
   "market": {

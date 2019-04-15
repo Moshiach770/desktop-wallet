@@ -107,7 +107,7 @@ class CryptoCompare {
   async checkTradeable (token) {
     const params = {
       fsym: token,
-      tsyms: 'BTC'
+      tsyms: 'USD'
     }
 
     try {

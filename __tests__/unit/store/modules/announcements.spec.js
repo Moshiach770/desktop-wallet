@@ -52,7 +52,7 @@ describe('the announcementStore getters', () => {
         [
           {
             guid: '1234ABCD',
-            title: 'Ark Arrives At Moon',
+            title: 'Phantom Arrives At Moon',
             summary: 'The value of PHANTOM reached 3 Bitcoin today as all hodlers bought lambos for their pets.',
             url: 'https://fakenews.com/phantom-lunar-trip'
           },
@@ -90,7 +90,7 @@ describe('the announcementStore getters', () => {
         [
           {
             guid: '1234ABCD',
-            title: 'Ark Arrives At Moon',
+            title: 'Phantom Arrives At Moon',
             summary: 'The value of PHANTOM reached 3 Bitcoin today as all hodlers bought lambos for their pets.',
             url: 'https://fakenews.com/phantom-lunar-trip'
           },

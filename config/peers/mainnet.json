@@ -1,19 +1,23 @@
-[{
+[
+  {
     "ip": "95.183.52.99",
     "port": 4003,
     "isHttps": false,
     "version": "2"
-  }, {
+  },
+  {
     "ip": "95.183.53.99",
     "port": 4003,
     "isHttps": false,
     "version": "2"
-  }, {
+  },
+  {
     "ip": "95.183.52.91",
     "port": 4003,
     "isHttps": false,
     "version": "2"
-  }, {
+  },
+  {
     "ip": "95.183.52.105",
     "port": 4003,
     "isHttps": false,
@@ -30,4 +34,125 @@
     "port": 4003,
     "isHttps": false,
     "version": "2"
-  }]
+  },
+  {
+    "ip": "144.217.86.185",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "144.217.162.9",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "54.39.21.14",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "104.209.180.20",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "144.217.243.108",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "158.69.198.161",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "54.39.144.20",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "144.217.87.71",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "167.114.3.202",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "142.93.249.175",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "54.39.144.49",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "155.138.138.254",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "198.204.247.125",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "149.28.197.113",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "45.63.48.72",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "52.67.178.136",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "139.180.200.191",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "45.76.212.221",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "149.28.28.140",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  },
+  {
+    "ip": "45.76.126.206",
+    "port": 4003,
+    "isHttps": false,
+    "version": "2"
+  }
+]

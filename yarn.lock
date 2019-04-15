@@ -47,9 +47,9 @@
     tiny-glob "^0.2.6"
     wif "^2.0.6"
 
-"@PhantomChain/ledger-transport@^0.1.0":
+"@arkecosystem/ledger-transport@^0.1.0":
   version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@PhantomChain/ledger-transport/-/ledger-transport-0.1.0.tgz#55de50cec3cd8b8cf43fb6180039ccae85cdc594"
+  resolved "https://registry.yarnpkg.com/@arkecosystem/ledger-transport/-/ledger-transport-0.1.0.tgz#55de50cec3cd8b8cf43fb6180039ccae85cdc594"
   integrity sha512-ViDuJf3Oa42tNFnxabCLWMXJr3E9+ROFXvTOaiHjprsSC5IXPIp6MNVg14PpAKKrCuYJ50H7DvTHkceHTkEAHg==
   dependencies:
     "@ledgerhq/hw-transport" "^4.7.3"

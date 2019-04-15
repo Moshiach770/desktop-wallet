@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/PhantomChain/desktop-wallet.git"
   },
-  "author": "PhantomChain <info@ark.io>",
+  "author": "ArkEcosystem <info@ark.io>",
   "contributors": [
     "Alex Barnsley <alex@ark.io>",
     "ItsANameToo <itsanametoo@protonmail.com>",
@@ -49,7 +49,7 @@
     "test:unit:watch": "jest --config __tests__/unit.jest.conf.js --watch"
   },
   "dependencies": {
-    "@PhantomChain/ledger-transport": "^0.1.0",
+    "@arkecosystem/ledger-transport": "^0.1.0",
     "@babel/runtime": "^7.4.2",
     "@ledgerhq/hw-transport-node-hid": "^4.24.0",
     "@phantomcores/client": "^0.1.20",

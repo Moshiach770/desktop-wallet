@@ -53,4 +53,4 @@ Broadcasting to multiple peers fixed and improved usability for custom networks 
 
 ## Previous versions
 
-See [GitHub releases](https://github.com/ArkEcosystem/desktop-wallet/releases).
+See [GitHub releases](https://github.com/PhantomChain/desktop-wallet/releases).

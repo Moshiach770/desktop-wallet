@@ -4,7 +4,7 @@
   "version": "2.3.2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ArkEcosystem/desktop-wallet.git"
+    "url": "git+https://github.com/PhantomChain/desktop-wallet.git"
   },
   "author": "ArkEcosystem <info@ark.io>",
   "contributors": [
@@ -17,9 +17,9 @@
   "description": "Phantom Ecosystem Desktop Wallet",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ArkEcosystem/desktop-wallet/issues"
+    "url": "https://github.com/PhantomChain/desktop-wallet/issues"
   },
-  "homepage": "https://github.com/ArkEcosystem/desktop-wallet#readme",
+  "homepage": "https://github.com/PhantomChain/desktop-wallet#readme",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",

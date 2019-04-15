@@ -1,5 +1,5 @@
 import LedgerTransport from '@ledgerhq/hw-transport-node-hid'
-import ArkLedger from '@PhantomChain/ledger-transport'
+import ArkLedger from '@arkecosystem/ledger-transport'
 import queue from 'async/queue'
 import logger from 'electron-log'
 

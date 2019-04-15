@@ -20,13 +20,13 @@ export default new BaseModel({
     sender: {
       type: 'string'
     },
-    // As arktoshi
+    // As phantomshi
     amount: {
       type: 'integer',
       minimum: 0,
       default: 0
     },
-    // As arktoshi
+    // As phantomshi
     fee: {
       type: 'integer',
       minimum: 0,
